@@ -18,18 +18,11 @@ using Labs.ACW.Textures;
 //==============================================================================================//
 //------------------------------------PORTAL EFFECT BUGS----------------------------------------//
 //TODO: Balls get stuck when passing through - Need to test why
-//TODO: Render texture stretching upwards?
 //TODO: Portal when rotating the world the view doesn't move the world does so the portal effect stays still when rotating
 //=============================================================================================//
 
-//==TIDYING
-//TODO: In every class add 'm' to the start of all the member variables
-//TODO: Need to tidy shader code
-
 //==FEATURES
-//TODO: Need to think of a way to dynamically add lights at run time
 //TODO: Particle 4 Dimension fragmenting look for the portal
-//TODO: Look into adding spatial segmentation
 //TODO: Look into having multiple shaders
 //TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
 //TODO: Have a check that removes really small spheres this could be checked in the Sphere of Doom code
@@ -129,7 +122,7 @@ namespace Labs.ACW
             GL.BindVertexArray(0);
             this.SwapBuffers();
 
-            projection = Matrix4.CreatePerspectiveFieldOfView(1, Bottom_Portal.width / Bottom_Portal.height, 0.5f, viewDistance);
+            projection = Matrix4.CreatePerspectiveFieldOfView(1, Bottom_Portal.mWidth / Bottom_Portal.mHeight, 0.5f, viewDistance);
             GL.UniformMatrix4(uProjectionLocation, true, ref projection);
 
             //Renders to Texture for the portal
@@ -149,54 +142,19 @@ namespace Labs.ACW
             Light.Update();
             Emitter.Update();
             SpotLight.Update();
+            Camera.Update(camera);
             splash.Update();
-
-            //Updates the portal views
-            mTopPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(-8, -11, 0) * Matrix4.CreateRotationY(-(float)Math.PI / 2) * Matrix4.CreateRotationZ(-(float)Math.PI / 2) * topRotation;
-            mBottomPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(2, 24, 0f) * Matrix4.CreateRotationX(-(float)Math.PI / 2) * bottomRotation;
-
+            
             //TODO: Turn into static method in the Particle class
             foreach (ParticleSystem sp in ActiveParticleSystems)
             {
                 sp.Update();
             }
 
-            if (Camera.Type == CameraType.Static)
-            {
-                camera.Reset();
-            }
+            //Updates the portal views
+            mTopPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(-8, -11, 0) * Matrix4.CreateRotationY(-(float)Math.PI / 2) * Matrix4.CreateRotationZ(-(float)Math.PI / 2) * topRotation;
+            mBottomPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(2, 24, 0f) * Matrix4.CreateRotationX(-(float)Math.PI / 2) * bottomRotation;
 
-            //TODO: Add these methods to the camera cs file
-            //Camera
-            if (Camera.Type == CameraType.FixedPath)
-            {  
-                camera.Rotate_World_Y(0.005f);
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
-            }
-            else if (Camera.Type == CameraType.FollowItem)
-            {
-                if (Sphere.DrawList.Count != 0)
-                {
-                    mView = Matrix4.CreateTranslation(0, 0, -10) * Matrix4.CreateTranslation(-Sphere.DrawList[0].Position);
-                    int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                    GL.UniformMatrix4(uView, true, ref mView);
-
-                    //TODO: Make the mGround model zero and move positions of all objects
-                    mGroundModel = Matrix4.CreateTranslation(1, -0.5f, 0f);
-                }
-            }
-            else if (Camera.Type == CameraType.PortalView)
-            {
-                mView = mTopPortalView;
-                //mView = mBottomPortalView;
-                int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-                GL.UniformMatrix4(uView, true, ref mView);
-            }
-            else if (Camera.Type != CameraType.FreeMoving)
-            {
-                Camera.Type = CameraType.Static;
-            }
 
         }  //Update
         protected override void OnLoad(EventArgs e)
@@ -477,7 +435,7 @@ namespace Labs.ACW
 
             //SoD
             Level.DoomSphere.Apply_MaterialValues();
-            Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.Radius) * Matrix4.CreateTranslation(Level.DoomSphere.Position) * Level.Level3 * mGroundModel;
+            Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.mRadius) * Matrix4.CreateTranslation(Level.DoomSphere.mPosition) * Level.Level3 * mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref DoomSphereLocation);
             GL.DrawElements(BeginMode.Triangles, mSphereModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -547,7 +505,7 @@ namespace Labs.ACW
             //Bind
             Bottom_Portal.Bind_Buffer();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            ViewPortTest();
+            Portal_ViewportUpdate();
 
             GL.Enable(EnableCap.CullFace);
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
@@ -596,7 +554,7 @@ namespace Labs.ACW
             Top_Portal.Bind_Buffer();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            ViewPortTest();
+            Portal_ViewportUpdate();
 
             GL.Enable(EnableCap.CullFace);
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
@@ -623,7 +581,7 @@ namespace Labs.ACW
             //SoD
             GL.BindVertexArray(mVAO[0]);
             Level.DoomSphere.Apply_MaterialValues();
-            Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.Radius) * Matrix4.CreateTranslation(Level.DoomSphere.Position) * Level.Level3 * mGroundModel;
+            Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.mRadius) * Matrix4.CreateTranslation(Level.DoomSphere.mPosition) * Level.Level3 * mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref DoomSphereLocation);
             GL.DrawElements(BeginMode.Triangles, mSphereModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
@@ -634,12 +592,11 @@ namespace Labs.ACW
             Frame_Buffer.Unbind_Buffer();
         }
 
-        //TODO: Implement me
-        private void ViewPortTest()
+        //Poral viewing angles
+        private void Portal_ViewportUpdate()
         {
-            GL.Viewport(0, 0, Bottom_Portal.width, Bottom_Portal.height);
+            GL.Viewport(0, 0, Bottom_Portal.mWidth, Bottom_Portal.mHeight);
         }
-
         private void Portal_Camera()
         {
             Vector3 currentCameraPosition = Vector3.Transform(new Vector3(0, 0, 0), mView);

@@ -20,10 +20,10 @@ namespace Labs.ACW.Object
 
             mTimer.Start();
         }
-        public Sphere(Sphere sphere) : base(sphere.Position, sphere.Radius, sphere.Density, sphere.material)
+        public Sphere(Sphere sphere) : base(sphere.mPosition, sphere.mRadius, sphere.mDensity, sphere.material)
         {
             mVelocity = sphere.mVelocity;
-            mOldPosition = sphere.Position;
+            mOldPosition = sphere.mPosition;
 
             mTimer.Start();
         }
@@ -54,7 +54,7 @@ namespace Labs.ACW.Object
         {
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
 
-            Matrix4 SphereLocation = Matrix4.CreateScale(Radius) * Matrix4.CreateTranslation(Position) * ACWWindow.mGroundModel;
+            Matrix4 SphereLocation = Matrix4.CreateScale(mRadius) * Matrix4.CreateTranslation(mPosition) * ACWWindow.mGroundModel;
 
             Apply_MaterialValues();
 
@@ -110,9 +110,9 @@ namespace Labs.ACW.Object
             {
                 for (int i = 0, length = DrawList.Count; i < length; i++)
                 {
-                    float x = DrawList[i].Position.X;
-                    float y = DrawList[i].Position.Y;
-                    float z = DrawList[i].Position.Z;
+                    float x = DrawList[i].mPosition.X;
+                    float y = DrawList[i].mPosition.Y;
+                    float z = DrawList[i].mPosition.Z;
 
                     int range = 20;
                     if (x > range || x < -range || float.IsNaN(x))
@@ -135,13 +135,13 @@ namespace Labs.ACW.Object
         public void Recalculate_Mass()
         {
             //m = v * density 
-            Mass = (4 / 3 * (float)Math.PI * (float)Math.Pow(Radius, 3)) * Density;
+            mMass = (4 / 3 * (float)Math.PI * (float)Math.Pow(mRadius, 3)) * mDensity;
         }
 
         //Main Sphere update methods
         public Sphere UpdateOther_Collisions(Sphere s)
         {
-            if (s.Radius < 0)
+            if (s.mRadius < 0)
             {
                 s.DeleteMe = true;
             }
@@ -166,48 +166,48 @@ namespace Labs.ACW.Object
         private Sphere CaculateSphereToStaticWallCollision(Sphere s)
         {
             //Collides with the bottom Portal
-            if (s.Position.Y - s.Radius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().Y))
+            if (s.mPosition.Y - s.mRadius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().Y))
             {
                 s = BottomPortal_CollisionAction(s);
             }
             else
             {
                 //Other portal
-                if (s.Position.X + s.Radius >= 0.2f * ACWWindow.mContainerMatrix.ExtractScale().X && 
-                    (Level.Level0.ExtractTranslation().Y - 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) <= s.Position.Y && 
-                    (Level.Level0.ExtractTranslation().Y + 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) >= s.Position.Y)
+                if (s.mPosition.X + s.mRadius >= 0.2f * ACWWindow.mContainerMatrix.ExtractScale().X && 
+                    (Level.Level0.ExtractTranslation().Y - 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) <= s.mPosition.Y && 
+                    (Level.Level0.ExtractTranslation().Y + 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) >= s.mPosition.Y)
                 {
                     s = TopPortal_CollisionAction(s);
                 }
                 else
                 {
-                    if (s.Position.X + s.Radius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().X)
+                    if (s.mPosition.X + s.mRadius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().X)
                     {
-                        s.Position = s.mOldPosition;
+                        s.mPosition = s.mOldPosition;
                         Vector3 normal = new Vector3(-1, 0, 0);
                         s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                     }
-                    else if (s.Position.X - s.Radius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().X))
+                    else if (s.mPosition.X - s.mRadius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().X))
                     {
-                        s.Position = s.mOldPosition;
+                        s.mPosition = s.mOldPosition;
                         Vector3 normal = new Vector3(1, 0, 0);
                         s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                     }
-                    else if (s.Position.Y + s.Radius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().Y)
+                    else if (s.mPosition.Y + s.mRadius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().Y)
                     {
-                        s.Position = s.mOldPosition;
+                        s.mPosition = s.mOldPosition;
                         Vector3 normal = new Vector3(0, -1, 0);
                         s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                     }
-                    else if (s.Position.Z + s.Radius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().Z)
+                    else if (s.mPosition.Z + s.mRadius > 0.2 * ACWWindow.mContainerMatrix.ExtractScale().Z)
                     {
-                        s.Position = s.mOldPosition;
+                        s.mPosition = s.mOldPosition;
                         Vector3 normal = new Vector3(0, 0, -1);
                         s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                     }
-                    else if (s.Position.Z - s.Radius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().Z))
+                    else if (s.mPosition.Z - s.mRadius < -(0.2 * ACWWindow.mContainerMatrix.ExtractScale().Z))
                     {
-                        s.Position = s.mOldPosition;
+                        s.mPosition = s.mOldPosition;
                         Vector3 normal = new Vector3(0, 0, 1);
                         s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                     }
@@ -218,13 +218,13 @@ namespace Labs.ACW.Object
         private bool CalculateSphereToSphereCollision(Sphere Shape2)
         {
             //Checks if spheres are even near each other
-            if (Position.X + Radius + Shape2.Radius > Shape2.Position.X
-            && Position.X < Shape2.Position.X + Radius + Shape2.Radius
-            && Position.Y + Radius + Shape2.Radius > Shape2.Position.Y
-            && Position.Y < Shape2.Position.Y + Radius + Shape2.Radius)
+            if (mPosition.X + mRadius + Shape2.mRadius > Shape2.mPosition.X
+            && mPosition.X < Shape2.mPosition.X + mRadius + Shape2.mRadius
+            && mPosition.Y + mRadius + Shape2.mRadius > Shape2.mPosition.Y
+            && mPosition.Y < Shape2.mPosition.Y + mRadius + Shape2.mRadius)
             {
-                float distance = (Position - Shape2.Position).Length;
-                float radiusValue = Radius + Shape2.Radius;
+                float distance = (mPosition - Shape2.mPosition).Length;
+                float radiusValue = mRadius + Shape2.mRadius;
 
                 float depth = radiusValue - distance;
                 if (depth > 0)
@@ -238,34 +238,40 @@ namespace Labs.ACW.Object
         } //Two moving spheres
         private Sphere CalculateSphereToSODCollision(Sphere s)
         {
-            Vector3 doomSphereWorldSpace = Vector3.Transform(Level.DoomSphere.Position, Level.Level3);
+            Vector3 doomSphereWorldSpace = Vector3.Transform(Level.DoomSphere.mPosition, Level.Level3);
 
-            float distance = (s.Position - doomSphereWorldSpace).Length;
-            float radius = s.Radius + Level.DoomSphere.Radius;
+            float distance = (s.mPosition - doomSphereWorldSpace).Length;
+            float radius = s.mRadius + Level.DoomSphere.mRadius;
 
             //SoD effect
             Vector3 FlashColour = new Vector3(1, 0, 0);
-            if (SpotLight.SpotLights[0].Colour.X >= 0)
+            if (SpotLight.SpotLights[0].mColour.X >= 0)
             {
-                SpotLight.SpotLights[0].Colour -= FlashColour / 100;
+                SpotLight.SpotLights[0].mColour -= FlashColour / 100;
             }
             
             if (distance < radius)
             {
                 float reduction_Speed = 0.03f;
 
-                s.Radius -= reduction_Speed;
+                s.mRadius -= reduction_Speed;
 
-                Vector3 directionOfCollision = Level.DoomSphere.Position - s.Position;
+                Vector3 directionOfCollision = Level.DoomSphere.mPosition - s.mPosition;
                 directionOfCollision.Normalize();
 
-                s.Position += directionOfCollision * (reduction_Speed / 2);
+                s.mPosition += directionOfCollision * (reduction_Speed / 2);
 
                 s.Recalculate_Mass();
 
-                //Light.Lights[2].Colour.X = 1;
-                SpotLight.SpotLights[0].Colour = FlashColour;
-                SpotLight.SpotLights[0].Direction = directionOfCollision;
+                //This prevents really small balls from occurring
+                if (s.mRadius < 0.1f)
+                {
+                    s.DeleteMe = true;
+                }
+
+                //Adds a spotlight effect
+                SpotLight.SpotLights[0].mColour = FlashColour;
+                SpotLight.SpotLights[0].mDirection = directionOfCollision;
             }
 
             return s;
@@ -300,7 +306,7 @@ namespace Labs.ACW.Object
             Vector3 SquareSideDirection = ((L1p - L2p));
             SquareSideDirection.Normalize();
 
-            Vector3 Cp = s.Position;
+            Vector3 Cp = s.mPosition;
 
             //Parrell position on the square
             Vector3 A = (Vector3.Dot((Cp - L2p), SquareSideDirection) * SquareSideDirection);
@@ -310,14 +316,14 @@ namespace Labs.ACW.Object
 
             if (A.Length < (L1p - L2p).Length && AStrength > 0) //If A is within the square
             {
-                if (VectorFromSquare.Length < s.Radius + c.Radius)
+                if (VectorFromSquare.Length < s.mRadius + c.mRadius)
                 {
                     Vector3 normal;
 
-                    normal = (s.Position - (L2p + A));
+                    normal = (s.mPosition - (L2p + A));
                     normal.Normalize();
 
-                    s.Position = s.mOldPosition;
+                    s.mPosition = s.mOldPosition;
                     s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                 }
             }
@@ -329,7 +335,7 @@ namespace Labs.ACW.Object
         private List<Sphere> Collision_Action(Sphere Shape2)
         {
             //Direction
-            Vector3 n = Shape2.Position - Position;
+            Vector3 n = Shape2.mPosition - mPosition;
             n.Normalize();
 
             Vector3 v1 = mVelocity;
@@ -337,8 +343,8 @@ namespace Labs.ACW.Object
             Vector3 u1 = mVelocity;
             Vector3 u2 = Shape2.mVelocity;
 
-            float m1 = Mass;
-            float m2 = Shape2.Mass;
+            float m1 = mMass;
+            float m2 = Shape2.mMass;
 
             Vector3 blue_Arrow1, blue_Arrow2, Parallel1, Parallel2;
 
@@ -357,8 +363,8 @@ namespace Labs.ACW.Object
             Shape2.mVelocity = (m2 * u2 + m1 * u1 + (ACWWindow.E * m1 * (u1 - u2))) / (m2 + m1);
 
             //Moves back before touching
-            Position = mOldPosition;
-            Shape2.Position = Shape2.mOldPosition;
+            mPosition = mOldPosition;
+            Shape2.mPosition = Shape2.mOldPosition;
 
             List<Sphere> BothCircles = new List<Sphere>();
             BothCircles.Add(this);
@@ -369,7 +375,7 @@ namespace Labs.ACW.Object
         {
             ACWWindow.splash.Add_System(new Utility.Splash_System(
                     ACWWindow.mCubeModel, //Model
-                    new Vector3(s.Position.X, -20, s.Position.Z), //Position
+                    new Vector3(s.mPosition.X, -20, s.mPosition.Z), //Position
                     squareSideSize, //ZFar
                     squareSideSize, //XRight
                     0.001f, //Spawn rate
@@ -382,10 +388,10 @@ namespace Labs.ACW.Object
                     s.material)); //Material
 
             //Moves the position
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateScale(-1, 1, 1));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateRotationY((float)Math.PI / 2));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateTranslation(new Vector3(24, 15f, 0)));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateScale(-1, 1, 1));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationY((float)Math.PI / 2));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateTranslation(new Vector3(24, 15f, 0)));
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
@@ -395,12 +401,12 @@ namespace Labs.ACW.Object
         private Sphere TopPortal_CollisionAction(Sphere s)
         {
             ACWWindow.splash.Add_System(new Utility.Splash_System(
-                        ACWWindow.mCubeModel, new Vector3(4, s.Position.Y, s.Position.Z), squareSideSize, squareSideSize, 0.001f, particle_Life, maxParticles, 0, s.mVelocity, new Vector3(1, 0, 0), 40, s.material));
+                        ACWWindow.mCubeModel, new Vector3(4, s.mPosition.Y, s.mPosition.Z), squareSideSize, squareSideSize, 0.001f, particle_Life, maxParticles, 0, s.mVelocity, new Vector3(1, 0, 0), 40, s.material));
 
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateTranslation(new Vector3(-24, -15f, 0)));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateRotationZ((float)Math.PI / 2));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateRotationY(-(float)Math.PI / 2));
-            s.Position = Vector3.Transform(s.Position, Matrix4.CreateScale(-1, 1, 1));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateTranslation(new Vector3(-24, -15f, 0)));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationZ((float)Math.PI / 2));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationY(-(float)Math.PI / 2));
+            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateScale(-1, 1, 1));
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ((float)Math.PI / 2));
@@ -430,8 +436,8 @@ namespace Labs.ACW.Object
             mTimestep = mTimer.GetElapsedSeconds();
             totalTime += mTimestep;
 
-            s.mOldPosition = s.Position;
-            s.Position = s.Position + (s.mVelocity * mTimestep);
+            s.mOldPosition = s.mPosition;
+            s.mPosition = s.mPosition + (s.mVelocity * mTimestep);
             s.mVelocity = s.mVelocity + ACWWindow.gravityAcceleration * mTimestep;
 
             return s;
@@ -441,9 +447,9 @@ namespace Labs.ACW.Object
             mTimestep = mTimer.GetElapsedSeconds();
             totalTime += mTimestep;
 
-            s.mOldPosition = s.Position;
+            s.mOldPosition = s.mPosition;
             s.mVelocity += ACWWindow.gravityAcceleration * mTimestep;
-            s.Position += mTimestep * (s.mVelocity);
+            s.mPosition += mTimestep * (s.mVelocity);
 
             return s;
         }
@@ -457,7 +463,7 @@ namespace Labs.ACW.Object
 
             State state;
             state.v = s.mVelocity;
-            state.x = s.Position;
+            state.x = s.mPosition;
 
             a = evaluate(ref state, 0, dt, new Derivative());
             b = evaluate(ref state, 0, dt * 0.5f, a);
@@ -469,10 +475,10 @@ namespace Labs.ACW.Object
             state.x = state.x + dxdt * dt;
             state.v = state.v + ACWWindow.gravityAcceleration * dt;
 
-            s.mOldPosition = s.Position;
+            s.mOldPosition = s.mPosition;
 
 
-            s.Position = state.x;
+            s.mPosition = state.x;
             s.mVelocity = state.v;
 
             return s;

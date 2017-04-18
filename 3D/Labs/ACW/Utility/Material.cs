@@ -21,32 +21,32 @@ namespace Labs.ACW
 
         public static Material portal_Blue = new Material(new Vector3(1,1,1), new Vector3(1,1,1) * 0.1f, Vector3.Zero, 0);
 
-        public Vector3 Ambient;
-        public Vector3 Diffuse;
-        public Vector3 Specular;
-        public float Shininess;
+        public Vector3 mAmbient;
+        public Vector3 mDiffuse;
+        public Vector3 mSpecular;
+        public float mShininess;
 
         public Material(Vector3 ambient, Vector3 diffuse, Vector3 specular, float shininess)
         {
-            Ambient = ambient;
-            Diffuse = diffuse;
-            Specular = specular;
-            Shininess = shininess;
+            mAmbient = ambient;
+            mDiffuse = diffuse;
+            mSpecular = specular;
+            mShininess = shininess;
         }
 
         public void Assign_Material()
         {
             int AReflectLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uMaterial.AmbientReflectivity");
-            GL.Uniform3(AReflectLocation, Ambient);
+            GL.Uniform3(AReflectLocation, mAmbient);
 
             int DReflectLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uMaterial.DiffuseReflectivity");
-            GL.Uniform3(DReflectLocation, Diffuse);
+            GL.Uniform3(DReflectLocation, mDiffuse);
 
             int SReflectLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uMaterial.SpecularReflectivity");
-            GL.Uniform3(SReflectLocation, Specular);
+            GL.Uniform3(SReflectLocation, mSpecular);
 
             int ShininessLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uMaterial.Shininess");
-            GL.Uniform1(ShininessLocation, Shininess);
+            GL.Uniform1(ShininessLocation, mShininess);
         }
 
     }

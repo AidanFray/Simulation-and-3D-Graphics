@@ -6,23 +6,23 @@ namespace Labs.ACW
 {
     public class Light
     {
-        public static List<Light> Lights = new List<Light>();
+        public static List<Light> mLights = new List<Light>();
 
-        public Vector3 Position;
-        public Vector3 Colour;
-        public Vector3 Attenuation = new Vector3(1, 0, 0);
+        public Vector3 mPosition;
+        public Vector3 mColour;
+        public Vector3 mAttenuation = new Vector3(1, 0, 0);
 
         public Light(Vector3 Pos, Vector3 Col)
         {
-            Position = Pos;
-            Colour = Col;
-            Attenuation = new Vector3(0, 0.15f,0); //Basic attenuation 
+            mPosition = Pos;
+            mColour = Col;
+            mAttenuation = new Vector3(0, 0.15f,0); //Basic attenuation 
         }
         public Light(Vector3 Pos, Vector3 Col, Vector3 attenuation)
         {
-            Position = Pos;
-            Colour = Col;
-            Attenuation = attenuation;
+            mPosition = Pos;
+            mColour = Col;
+            mAttenuation = attenuation;
         }
         
         //Creates lights and manages objects
@@ -33,21 +33,21 @@ namespace Labs.ACW
             GL.Uniform4(uEyePositionLocation, eyePosition);
             
             //Changes to lights done here
-            Lights.Add(new Light(new Vector3(0, 0, 0), new Vector3(1, 1, 0)));
-            Lights.Add(new Light(new Vector3(0, -18, 0), new Vector3(0, 1, 1)));
-            Lights.Add(new Light(new Vector3(0, 15, 0), new Vector3(1, 0, 1)));
+            mLights.Add(new Light(new Vector3(0, 0, 0), new Vector3(1, 1, 0)));
+            mLights.Add(new Light(new Vector3(0, 15, 0), new Vector3(0, 1, 1)));
+            mLights.Add(new Light(new Vector3(0, -15, 0), new Vector3(1, 0, 1)));
 
-            for (int i = 0; i < Lights.Count; i++)
+            for (int i = 0; i < mLights.Count; i++)
             {
-                Lights[i].ApplyLight(i);
+                mLights[i].ApplyLight(i);
             }
         }
 
         public static void Update()
         {
-            for (int i = 0; i < Lights.Count; i++)
+            for (int i = 0; i < mLights.Count; i++)
             {
-                Lights[i].ApplyLight(i);
+                mLights[i].ApplyLight(i);
             }
         }
 
@@ -56,20 +56,20 @@ namespace Labs.ACW
             string format = string.Format("uLight[{0}]", index);
 
             int uLightDirectionLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".Position");
-            Vector4 lightPosition = Vector4.Transform(new Vector4(Position, 1), ACWWindow.mView);
+            Vector4 lightPosition = Vector4.Transform(new Vector4(mPosition, 1), ACWWindow.mView);
             GL.Uniform4(uLightDirectionLocation, lightPosition);
 
             int uAmbientLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".AmbientLight");
-            GL.Uniform3(uAmbientLightLocation, Colour);
+            GL.Uniform3(uAmbientLightLocation, mColour);
 
             int uDiffuseLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".DiffuseLight");
-            GL.Uniform3(uDiffuseLightLocation, Colour);
+            GL.Uniform3(uDiffuseLightLocation, mColour);
 
             int uSpectualrLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".SpecularLight");
-            GL.Uniform3(uSpectualrLightLocation, Colour);
+            GL.Uniform3(uSpectualrLightLocation, mColour);
 
             int AttenuationLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".Attenuation");
-            GL.Uniform3(AttenuationLocation, Attenuation);
+            GL.Uniform3(AttenuationLocation, mAttenuation);
 
         }
     }
@@ -78,25 +78,25 @@ namespace Labs.ACW
     {
         public static List<SpotLight> SpotLights = new List<SpotLight>();
 
-        public Vector3 Direction;
-        float CutOffAngle;
-        float OuterCutOffAngle;
+        public Vector3 mDirection;
+        float mCutOffAngle;
+        float mOuterCutOffAngle;
         
         public SpotLight(Vector3 pos, Vector3 col, Vector3 direction, float cutOffAngle, float outercutOff) : base(pos, col)
         {
-            Direction = direction;
-            CutOffAngle = cutOffAngle;
-            OuterCutOffAngle = outercutOff;
+            mDirection = direction;
+            mCutOffAngle = cutOffAngle;
+            mOuterCutOffAngle = outercutOff;
 
-            Attenuation = new Vector3(0, 0.07f, 0); //Basic attenuation 
+            mAttenuation = new Vector3(0, 0.07f, 0); //Basic attenuation 
         }
         public SpotLight(Vector3 pos, Vector3 col, Vector3 direction, float cutOffAngle, float outercutOff, Vector3 atten) : base(pos, col)
         {
-            Direction = direction;
-            CutOffAngle = cutOffAngle;
-            OuterCutOffAngle = outercutOff;
+            mDirection = direction;
+            mCutOffAngle = cutOffAngle;
+            mOuterCutOffAngle = outercutOff;
 
-            Attenuation = atten;
+            mAttenuation = atten;
         }
 
         public static new void Init()
@@ -127,31 +127,31 @@ namespace Labs.ACW
             string format = string.Format("spotLight");
 
             int uLightDirectionLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".Position");
-            Vector4 lightPosition = Vector4.Transform(new Vector4(Position, 1), ACWWindow.mView);
+            Vector4 lightPosition = Vector4.Transform(new Vector4(mPosition, 1), ACWWindow.mView);
             GL.Uniform4(uLightDirectionLocation, lightPosition);
 
             int uAmbientLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".AmbientLight");
-            GL.Uniform3(uAmbientLightLocation, Colour);
+            GL.Uniform3(uAmbientLightLocation, mColour);
 
             int uDiffuseLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".DiffuseLight");
-            GL.Uniform3(uDiffuseLightLocation, Colour);
+            GL.Uniform3(uDiffuseLightLocation, mColour);
 
             int uSpectualrLightLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".SpecularLight");
-            GL.Uniform3(uSpectualrLightLocation, Colour);
+            GL.Uniform3(uSpectualrLightLocation, mColour);
 
             int AttenuationLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".Attenuation");
-            GL.Uniform3(AttenuationLocation, Attenuation);
+            GL.Uniform3(AttenuationLocation, mAttenuation);
 
             int DirectionLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".Direction");
             //Vector3 direction = Vector3.Transform(Direction, ACWWindow.mGroundModel);
-            Vector3 direction = Direction;
+            Vector3 direction = mDirection;
             GL.Uniform3(DirectionLocation, direction);
 
             int CutOffLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".CutOff");
-            GL.Uniform1(CutOffLocation, CutOffAngle);
+            GL.Uniform1(CutOffLocation, mCutOffAngle);
 
             int OCutOffLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, format + ".OuterCutOff");
-            GL.Uniform1(OCutOffLocation, OuterCutOffAngle);
+            GL.Uniform1(OCutOffLocation, mOuterCutOffAngle);
         }
     }
 }

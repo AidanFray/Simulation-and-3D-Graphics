@@ -94,7 +94,7 @@ void SpotLight()
 
 	float specularFactor = pow(max(dot(reflectedVector, eyeDirection), 0), uMaterial.Shininess);
 	float diffuseFactor = max(dot(oNormal, lightDir), 0); 
-	float ambientFactor = 0.3f;
+	float ambientFactor = 0.2f;
 	
 
 	//Spotlight

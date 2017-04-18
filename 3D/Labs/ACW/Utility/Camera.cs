@@ -1,4 +1,5 @@
-﻿using OpenTK;
+﻿using Labs.ACW.Object;
+using OpenTK;
 using OpenTK.Graphics.OpenGL;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,47 @@ namespace Labs.ACW
     class Camera
     {
         public static CameraType Type = new CameraType();
+
+        public static void Update(Camera camera)
+        {
+            if (Camera.Type == CameraType.Static)
+            {
+                camera.Reset();
+            }
+            else
+            {
+
+                if (Camera.Type == CameraType.FixedPath)
+                {
+                    camera.Rotate_World_Y(0.005f);
+                    int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
+                }
+                else if (Camera.Type == CameraType.FollowItem)
+                {
+                    if (Sphere.DrawList.Count != 0)
+                    {
+                        ACWWindow.mView = Matrix4.CreateTranslation(0, 0, -10) * Matrix4.CreateTranslation(-Sphere.DrawList[0].mPosition);
+                        int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
+                        GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
+
+                        //TODO: Make the mGround model zero and move positions of all objects
+                        ACWWindow.mGroundModel = Matrix4.CreateTranslation(1, -0.5f, 0f);
+                    }
+                }
+                else if (Camera.Type == CameraType.PortalView)
+                {
+                    ACWWindow.mView = ACWWindow.mTopPortalView;
+                    //mView = mBottomPortalView;
+                    int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
+                    GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
+                }
+                else if (Camera.Type != CameraType.FreeMoving)
+                {
+                    Camera.Type = CameraType.Static;
+                }
+            }
+        }
 
         public void Rotate_World_Y(float angle)
         {
@@ -52,10 +94,10 @@ namespace Labs.ACW
         public void UpdateLightPositions()
         {
             //Update positions
-            for (int i = 0; i < Light.Lights.Count; i++)
+            for (int i = 0; i < Light.mLights.Count; i++)
             {
                 int uLightDirectionLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, string.Format("uLight[{0}].Position", i)); //
-                Vector4 position = Vector4.Transform(new Vector4(Light.Lights[i].Position, 1), ACWWindow.mView);
+                Vector4 position = Vector4.Transform(new Vector4(Light.mLights[i].mPosition, 1), ACWWindow.mView);
                 GL.Uniform4(uLightDirectionLocation, position);
             }
         }

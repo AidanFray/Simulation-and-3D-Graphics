@@ -7,41 +7,41 @@ namespace Labs.ACW
 {
     class Emitter
     {
-        public static List<Emitter> EmitterList = new List<Emitter>();
-        private Timer SpawnTimer = new Timer();
+        public static List<Emitter> mEmitterList = new List<Emitter>();
+        private Timer mSpawnTimer = new Timer();
 
-        private Vector3 Position;
-        private float SpawnTime;
-        private Sphere SpawnSphere;
+        private Vector3 mPosition;
+        private float mSpawnTime;
+        private Sphere mSpawnSphere;
 
-        private bool Random_Velocity = true;
-        private Vector3 StaticVelocity;
+        private bool mRandom_Velocity = true;
+        private Vector3 mStaticVelocity;
 
         public Emitter(Vector3 pos, float spawnTime, Sphere sphere, bool RVel)
         {
-            Position = pos;
-            SpawnTime = spawnTime;
-            SpawnSphere = sphere;
+            mPosition = pos;
+            mSpawnTime = spawnTime;
+            mSpawnSphere = sphere;
 
             timeStep = 0;
 
-            Random_Velocity = RVel;
+            mRandom_Velocity = RVel;
         }
         public Emitter(Vector3 pos, float spawnTime, Sphere sphere, Vector3 Vel)
         {
-            Position = pos;
-            SpawnTime = spawnTime;
-            SpawnSphere = sphere;
+            mPosition = pos;
+            mSpawnTime = spawnTime;
+            mSpawnSphere = sphere;
 
-            Random_Velocity = false;
-            StaticVelocity = Vel;
+            mRandom_Velocity = false;
+            mStaticVelocity = Vel;
         }
 
         //Used to create and initalise the emitters
         public static void Init()
         {
-            EmitterList.Add(new Emitter(new Vector3(1, 18, 0), 2f, Sphere.Blue_Sphere, true));
-            EmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 3f, Sphere.Orange_Sphere, true));
+            mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 2f, Sphere.Blue_Sphere, true));
+            mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 3f, Sphere.Orange_Sphere, true));
 
             //EmitterList.Add(new Emitter(new Vector3(-4, 18, -4), 10, Sphere.Orange_Sphere, false));
         }
@@ -49,7 +49,7 @@ namespace Labs.ACW
         public static void Update()
         {
             //Updates the emitters
-            foreach (Emitter Em in EmitterList)
+            foreach (Emitter Em in mEmitterList)
             {
                 Em.CheckForEmission();
             }
@@ -59,28 +59,28 @@ namespace Labs.ACW
         bool Emitted = false;
         public void CheckForEmission()
         {
-            timeStep += SpawnTimer.GetElapsedSeconds(); //Adds the elapsed time
+            timeStep += mSpawnTimer.GetElapsedSeconds(); //Adds the elapsed time
 
             //If spawn time is off
-            if (SpawnTime == 0 && Emitted == false)
+            if (mSpawnTime == 0 && Emitted == false)
             {
                 //Using this to test gravity values
-                SpawnSphere.mVelocity = Vector3.Zero;
-                Sphere.DrawList.Add(new Sphere(SpawnSphere));
+                mSpawnSphere.mVelocity = Vector3.Zero;
+                Sphere.DrawList.Add(new Sphere(mSpawnSphere));
                 Emitted = true;
             }
-            else if (SpawnTime != 0)
+            else if (mSpawnTime != 0)
             {
                 {
-                    if (timeStep > SpawnTime && Sphere.DrawList.Count < ACWWindow.sphereLimit)
+                    if (timeStep > mSpawnTime && Sphere.DrawList.Count < ACWWindow.sphereLimit)
                     {
-                        Vector3 Velocity = StaticVelocity;
-                        if (Random_Velocity == true) //If random values are used
+                        Vector3 Velocity = mStaticVelocity;
+                        if (mRandom_Velocity == true) //If random values are used
                         {
                             Velocity = Randomise_Velocity();
                         }
 
-                        Sphere.DrawList.Add(new Sphere(Position, Velocity, SpawnSphere.Radius, SpawnSphere.Density, SpawnSphere.material)); //Creates a new sphere to draw
+                        Sphere.DrawList.Add(new Sphere(mPosition, Velocity, mSpawnSphere.mRadius, mSpawnSphere.mDensity, mSpawnSphere.material)); //Creates a new sphere to draw
                         timeStep = 0; //Resets time
                     }
                 }

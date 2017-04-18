@@ -65,7 +65,7 @@ namespace Labs.ACW.Utility
         {
             foreach (Particle Particle in ActiveParticles)
             {
-                if (Particle.Alive == true)
+                if (Particle.mAlive == true)
                 {
                     Particle.Update();
                 }
@@ -81,7 +81,7 @@ namespace Labs.ACW.Utility
         {
             foreach (Particle Particle in ActiveParticles)
             {
-                if (Particle.Alive == true)
+                if (Particle.mAlive == true)
                 {
                     Particle.Draw();
                 }
@@ -124,15 +124,15 @@ namespace Labs.ACW.Utility
     }
     public class TemporaryParticleSystem : ParticleSystem
     {
-        public bool Alive = true;
-        float SystemLifeTime;
-        protected float DeltaTime;
-        protected Timer Time = new Timer();
+        public bool mAlive = true;
+        float mSystemLifeTime;
+        protected float mDeltaTime;
+        protected Timer mTime = new Timer();
 
         public TemporaryParticleSystem(ModelUtility model, Vector3 EmissionStartPoint, float SpawnRate, float LifeTime, int maxParticles, float S_LifeTime) :
             base(model, EmissionStartPoint, SpawnRate, LifeTime, maxParticles)
         {
-            SystemLifeTime = S_LifeTime;
+            mSystemLifeTime = S_LifeTime;
 
             Init_Timer();
         }
@@ -140,7 +140,7 @@ namespace Labs.ACW.Utility
         public TemporaryParticleSystem(ModelUtility model, Vector3 EmissionStartPoint, float ZFar, float XRight, float SpawnRate, float LifeTime, int maxParticles, float S_LifeTime) :
             base(model, EmissionStartPoint, ZFar, XRight, SpawnRate, LifeTime, maxParticles)
         {
-            SystemLifeTime = S_LifeTime;
+            mSystemLifeTime = S_LifeTime;
 
             Init_Timer();
         }
@@ -148,14 +148,14 @@ namespace Labs.ACW.Utility
         public TemporaryParticleSystem(ModelUtility model, Vector3 EmissionStartPoint, float ZFar, float XRight, float YUp, float SpawnRate, float LifeTime, int maxParticles, float S_LifeTime) :
             base(model, EmissionStartPoint, SpawnRate, LifeTime, maxParticles)
         {
-            S_LifeTime = SystemLifeTime;
+            S_LifeTime = mSystemLifeTime;
 
             Init_Timer();
         }
         
         public void Init_Timer()
         {
-            Time.Start();
+            mTime.Start();
         }
 
         float noSpawned;
@@ -163,16 +163,16 @@ namespace Labs.ACW.Utility
         {
             base.Update(); //Deals with particle death
 
-            DeltaTime += Time.GetElapsedSeconds();
+            mDeltaTime += mTime.GetElapsedSeconds();
              
             //If the system needs to stop
-            if (DeltaTime > SystemLifeTime && SystemLifeTime != 0)
+            if (mDeltaTime > mSystemLifeTime && mSystemLifeTime != 0)
             {
-                Alive = false;
+                mAlive = false;
             }
-            else if (DeltaTime > mSpawnTime)
+            else if (mDeltaTime > mSpawnTime)
             {
-                if (SystemLifeTime == 0)
+                if (mSystemLifeTime == 0)
                 {
                     if (noSpawned < mMaxParticles)
                     {
@@ -183,7 +183,7 @@ namespace Labs.ACW.Utility
                     {
                         if (ActiveParticles.Count == 0)
                         {
-                            Alive = false;
+                            mAlive = false;
                         }
                     }
 
@@ -197,38 +197,38 @@ namespace Labs.ACW.Utility
     public class Particle
     {
         //ATTRIBUTES
-        protected float LifeTime; //Default time
-        protected ModelUtility Model;
-        protected float DeltaTime; //THE REAL WORLD TIME PASSED
-        protected float Movement_Time;
-        private Timer timeElasped = new Timer();
-        public bool Alive;
-        public float RotationAngle;
-        public float AngleVelocity; //How fast the rotation is occurring
-        public Vector3 Scale;
-        public Vector3 Velocity;
-        public Vector3 Position;
-        public Material Material;
-        public float Alpha;
+        protected float mLifeTime; //Default time
+        protected ModelUtility mModel;
+        protected float mDeltaTime; //THE REAL WORLD TIME PASSED
+        protected float mMovement_Time;
+        private Timer mTimeElasped = new Timer();
+        public bool mAlive;
+        public float mRotationAngle;
+        public float mAngleVelocity; //How fast the rotation is occurring
+        public Vector3 mScale;
+        public Vector3 mVelocity;
+        public Vector3 mPosition;
+        public Material mMaterial;
+        public float mAlpha;
       
         public Particle(ModelUtility model, float lifeTime)
         { 
-            LifeTime = lifeTime; //SETS THE LIFETIME
-            Alive = true;
+            mLifeTime = lifeTime; //SETS THE LIFETIME
+            mAlive = true;
 
-            timeElasped.Start();
+            mTimeElasped.Start();
         }
 
         public virtual void Update()
         {
-            Movement_Time = timeElasped.GetElapsedSeconds();
-            DeltaTime += Movement_Time;
+            mMovement_Time = mTimeElasped.GetElapsedSeconds();
+            mDeltaTime += mMovement_Time;
             
 
             //If the lifetime has been passed
-            if (DeltaTime >= LifeTime)
+            if (mDeltaTime >= mLifeTime)
             {
-                Alive = false;
+                mAlive = false;
             }
         }
 
@@ -241,21 +241,21 @@ namespace Labs.ACW.Utility
     {
         public CubeParticle(ModelUtility model, float lifeTime, Material Mat, Vector3 velocity, Vector3 scale, Vector3 position) : base(model, lifeTime)
         {
-            Model = model;
-            Material = Mat;
-            Scale = scale;
-            Position = position;
-            Velocity = velocity;
+            mModel = model;
+            mMaterial = Mat;
+            mScale = scale;
+            mPosition = position;
+            mVelocity = velocity;
         }
 
         public override void Draw()
         {
-            Material.Assign_Material();
+            mMaterial.Assign_Material();
 
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
-            Matrix4 LocationMatrix = Matrix4.CreateScale(Scale) * Matrix4.CreateTranslation(Position) * ACWWindow.mGroundModel;
+            Matrix4 LocationMatrix = Matrix4.CreateScale(mScale) * Matrix4.CreateTranslation(mPosition) * ACWWindow.mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref LocationMatrix);
-            GL.DrawElements(BeginMode.Triangles, Model.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         public override void Update()
@@ -264,7 +264,7 @@ namespace Labs.ACW.Utility
             base.Update();
 
             //Moves the particle
-            Position = Position + Velocity * DeltaTime;
+            mPosition = mPosition + mVelocity * mDeltaTime;
 
             //TODO: Add rotation update
         }
@@ -273,21 +273,21 @@ namespace Labs.ACW.Utility
     {
         public SplashParticle(ModelUtility model, float lifeTime, Material Mat, Vector3 velocity, Vector3 scale, Vector3 position) : base(model, lifeTime)
         {
-            Model = model;
-            Material = Mat;
-            Scale = scale;
-            Position = position;
-            Velocity = velocity;
+            mModel = model;
+            mMaterial = Mat;
+            mScale = scale;
+            mPosition = position;
+            mVelocity = velocity;
         }
 
         public override void Draw()
         {
-            Material.Assign_Material();
+            mMaterial.Assign_Material();
 
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
-            Matrix4 LocationMatrix = Matrix4.CreateScale(Scale) * Matrix4.CreateTranslation(Position) * ACWWindow.mGroundModel;
+            Matrix4 LocationMatrix = Matrix4.CreateScale(mScale) * Matrix4.CreateTranslation(mPosition) * ACWWindow.mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref LocationMatrix);
-            GL.DrawElements(BeginMode.Triangles, Model.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         float scaleReduction = 0.01f;
@@ -296,17 +296,17 @@ namespace Labs.ACW.Utility
             //Updates time and checks if the particle should be dead
             base.Update();
 
-            Scale.Xzy -= new Vector3(scaleReduction, scaleReduction, scaleReduction);
+            mScale.Xzy -= new Vector3(scaleReduction, scaleReduction, scaleReduction);
 
             //Moves the particle
-            Velocity = Velocity + ACWWindow.gravityAcceleration * Movement_Time;
-            Position = Position + Velocity * Movement_Time;
+            mVelocity = mVelocity + ACWWindow.gravityAcceleration * mMovement_Time;
+            mPosition = mPosition + mVelocity * mMovement_Time;
         }
     }
 
     public class Floating_CubeSystem : ParticleSystem
     {
-        Material Mat;
+        Material mMat;
 
         private Timer timer = new Timer();
         protected float elaspedtime;
@@ -315,7 +315,7 @@ namespace Labs.ACW.Utility
         public Floating_CubeSystem(ModelUtility model, Vector3 EmissionStartPoint, float lifeTime, float spawnRate, int maxParticle, Material Material)
           : base(model, EmissionStartPoint, spawnRate, lifeTime, maxParticle)
         {
-            Mat = Material;
+            mMat = Material;
 
             timer.Start();
         }
@@ -323,7 +323,7 @@ namespace Labs.ACW.Utility
         public Floating_CubeSystem(ModelUtility model, Vector3 EmissionStartPoint, float ZFar, float XRight, float lifeTime, float spawnRate, int maxParticle, Material Material) 
             : base(model, EmissionStartPoint, ZFar, XRight, spawnRate, lifeTime, maxParticle)
         {
-            Mat = Material;
+            mMat = Material;
 
             timer.Start();
         }
@@ -331,7 +331,7 @@ namespace Labs.ACW.Utility
         public Floating_CubeSystem(ModelUtility model, Vector3 EmissionStartPoint, float ZFar, float XRight, float YUp, float lifeTime, float spawnRate, int maxParticle, Material Material)
             : base(model, EmissionStartPoint, ZFar, XRight, YUp, spawnRate, lifeTime, maxParticle)
         {
-            Mat = Material;
+            mMat = Material;
 
             timer.Start();
         }
@@ -375,23 +375,23 @@ namespace Labs.ACW.Utility
             //TODO: Add Rotation
             //TODO: Add Scale rnd 
 
-            return new CubeParticle(mModel, mParticle_LifeTime, Mat, vel, new Vector3(0.5f,0.5f,0.5f), pos);
+            return new CubeParticle(mModel, mParticle_LifeTime, mMat, vel, new Vector3(0.5f,0.5f,0.5f), pos);
         }
     }
     public class Splash_System : TemporaryParticleSystem
     {
-        Vector3 Velocity;
-        Vector3 Normal;
-        float CutOffAngle; //The angle either side of the velocity
-        Material Mat;
+        Vector3 mVelocity;
+        Vector3 mNormal;
+        float mCutOffAngle; //The angle either side of the velocity
+        Material mMaterial;
        
         public Splash_System(ModelUtility model, Vector3 EmissionStartPoint, float zFar, float xRight, float SpawnRate, float LifeTime, int maxParticles, float S_LifeTime, Vector3 velocity, Vector3 normal, float Angle, Material mat)
             : base(model, EmissionStartPoint, zFar, xRight, SpawnRate, LifeTime, maxParticles, S_LifeTime)
         {
-            Velocity = velocity;
-            CutOffAngle = Angle;
-            Mat = mat;
-            Normal = normal;
+            mVelocity = velocity;
+            mCutOffAngle = Angle;
+            mMaterial = mat;
+            mNormal = normal;
         }
 
         public override void Update()
@@ -407,12 +407,12 @@ namespace Labs.ACW.Utility
         Random rnd = new Random();
         public SplashParticle RandomizeParticle()
         {
-            float angle = (float)rnd.NextDouble() * ((float)Math.PI * CutOffAngle /180);
+            float angle = (float)rnd.NextDouble() * ((float)Math.PI * mCutOffAngle /180);
             
-            Vector3 velocity = Velocity.Length * Normal;
+            Vector3 velocity = mVelocity.Length * mNormal;
             velocity = Vector3.Transform(velocity, Matrix4.CreateRotationX(angle) * Matrix4.CreateRotationZ(angle));
             
-            return new SplashParticle(ACWWindow.mCubeModel, mParticle_LifeTime, Mat, -velocity * 0.4f, (new Vector3(1,1,1) * 0.3f), RandomizePosition());
+            return new SplashParticle(ACWWindow.mCubeModel, mParticle_LifeTime, mMaterial, -velocity * 0.4f, (new Vector3(1,1,1) * 0.3f), RandomizePosition());
         }
     }
     public class Splash
@@ -423,7 +423,7 @@ namespace Labs.ACW.Utility
         {
             foreach (Splash_System s in ActiveSplashes)
             {
-                if (s.Alive == false)
+                if (s.mAlive == false)
                 {
                     Delete.Add(s);
                 }

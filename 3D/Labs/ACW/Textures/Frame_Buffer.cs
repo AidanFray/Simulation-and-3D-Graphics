@@ -14,8 +14,8 @@ namespace Labs.ACW
         protected int mDepthbuffer_ID;
         protected int mFramebufferTexture_ID;
         
-        public int width = 1000;
-        public int height = 1000;
+        public int mWidth = 1000;
+        public int mHeight = 1000;
 
         public Frame_Buffer(TextureUnit texNumber, FramebufferAttachment colournumber)
         {
@@ -31,13 +31,13 @@ namespace Labs.ACW
             GL.BindTexture(TextureTarget.Texture2D, mFramebufferTexture_ID);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, width, height, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)null);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, mWidth, mHeight, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)null);
            
              
             ////Depth buffer
             GL.GenRenderbuffers(1, out mDepthbuffer_ID);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, mDepthbuffer_ID);
-            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, width, height);
+            GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, mWidth, mHeight);
           
             
             //Creates the FB Object
