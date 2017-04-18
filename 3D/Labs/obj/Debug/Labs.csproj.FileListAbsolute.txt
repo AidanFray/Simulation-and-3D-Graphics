@@ -1,0 +1,16 @@
+C:\Users\User\Desktop\508670\Labs\bin\Debug\ACW\Textures\BrickWall.jpg
+C:\Users\User\Desktop\508670\Labs\bin\Debug\ACW\Textures\ConcreteWall.jpg
+C:\Users\User\Desktop\508670\Labs\bin\Debug\ACW\Shaders\Light.frag
+C:\Users\User\Desktop\508670\Labs\bin\Debug\ACW\Shaders\s.vert
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Utility\Models\cylinder.bin
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Utility\Models\MainCube.sjg
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Utility\Models\model.bin
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Utility\Models\Particle_Cube.sjg
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Utility\Models\sphere.bin
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Labs.exe.config
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Labs.exe
+C:\Users\User\Desktop\508670\Labs\bin\Debug\Labs.pdb
+C:\Users\User\Desktop\508670\Labs\bin\Debug\OpenTK.dll
+C:\Users\User\Desktop\508670\Labs\obj\Debug\Labs.csprojResolveAssemblyReference.cache
+C:\Users\User\Desktop\508670\Labs\obj\Debug\Labs.exe
+C:\Users\User\Desktop\508670\Labs\obj\Debug\Labs.pdb
