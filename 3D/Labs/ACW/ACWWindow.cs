@@ -25,7 +25,7 @@ using Labs.ACW.Textures;
 //TODO: Particle 4 Dimension fragmenting look for the portal
 //TODO: Look into having multiple shaders
 //TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
-//TODO: Have a check that removes really small spheres this could be checked in the Sphere of Doom code
+//TODO: Add splash when the ball comes out the other end
 
 namespace Labs.ACW
 {
@@ -441,7 +441,7 @@ namespace Labs.ACW
 
             //Draws Cubes
             GL.BindVertexArray(mVAO[1]);
-           
+            
             Material.silver.Assign_Material();
             DrawTopBox(mBoxMatrix * mGroundModel * Level.Level0);
             DrawBox(mBoxMatrix * mGroundModel * Level.Level1);
@@ -498,7 +498,7 @@ namespace Labs.ACW
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 30 * sizeof(float)); //Bottom
 
         } //Missed the top section
-        
+       
         //Renders to Texture
         private void RenderToTexture_Bottom_Portal()
         {

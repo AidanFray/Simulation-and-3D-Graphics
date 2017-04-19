@@ -45,7 +45,6 @@ namespace Labs.ACW
                         int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
                         GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
 
-                        //TODO: Make the mGround model zero and move positions of all objects
                         ACWWindow.mGroundModel = Matrix4.CreateTranslation(1, -0.5f, 0f);
                     }
                 }

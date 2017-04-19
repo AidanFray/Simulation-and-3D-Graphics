@@ -34,7 +34,6 @@ namespace Labs.ACW
     // h - Switch Intergeneration method
     //------------------------------------------//
 
-    //TODO: Move camera methods into the camera class
     public class Control
     {
         public void Toggle_Gravity() //'g'

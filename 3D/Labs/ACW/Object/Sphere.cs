@@ -154,9 +154,9 @@ namespace Labs.ACW.Object
 
                 //Stops the ball from going out of bounds
                 s = CaculateSphereToStaticWallCollision(s);
-                
-                s = CalculateSphereToSODCollision(s);
 
+                //Colides with the Sphere of Doom
+                //s = CalculateSphereToSODCollision(s);
             }
 
             return s;
@@ -386,13 +386,23 @@ namespace Labs.ACW.Object
                     new Vector3(0, -1, 0), //Direction 
                     20, //Angle
                     s.material)); //Material
+            
+            Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
+            Vector3 TopPortalCentre = new Vector3(4, 15, 0);
+            
+            //Get it's distance and direction from the portal center
+            float distance = (BottomPortalCentre - s.mPosition).Length;
 
-            //Moves the position
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateScale(-1, 1, 1));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationY((float)Math.PI / 2));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateTranslation(new Vector3(24, 15f, 0)));
+            Vector3 direction = (s.mPosition - BottomPortalCentre);
+            direction.Normalize();
 
+            //Rotate direction in the z direction 90*
+            direction = Vector3.Transform(direction, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
+
+            //Apply new direction to other portal position and work out new balls position
+            Vector3 newPosition = TopPortalCentre + (direction * distance);
+            s.mPosition = newPosition;
+            
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
 
@@ -403,14 +413,26 @@ namespace Labs.ACW.Object
             ACWWindow.splash.Add_System(new Utility.Splash_System(
                         ACWWindow.mCubeModel, new Vector3(4, s.mPosition.Y, s.mPosition.Z), squareSideSize, squareSideSize, 0.001f, particle_Life, maxParticles, 0, s.mVelocity, new Vector3(1, 0, 0), 40, s.material));
 
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateTranslation(new Vector3(-24, -15f, 0)));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationZ((float)Math.PI / 2));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateRotationY(-(float)Math.PI / 2));
-            s.mPosition = Vector3.Transform(s.mPosition, Matrix4.CreateScale(-1, 1, 1));
+            Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
+            Vector3 TopPortalCentre = new Vector3(4, 15, 0);
+
+         
+            //Get it's distance and direction from the portal center
+            float distance = (TopPortalCentre - s.mPosition).Length;
+
+            Vector3 direction = (s.mPosition - TopPortalCentre);
+            direction.Normalize();
+
+            //Rotate direction in the z direction 90*
+            direction = Vector3.Transform(direction, Matrix4.CreateRotationZ((float)Math.PI / 2));
+
+            //Apply new direction to other portal position and work out new balls position
+            Vector3 newPosition = BottomPortalCentre + (direction * distance);
+            s.mPosition = newPosition;
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ((float)Math.PI / 2));
-
+            
             return s;
         }
 
