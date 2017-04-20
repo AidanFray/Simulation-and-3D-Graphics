@@ -298,6 +298,12 @@ namespace Labs.ACW.Utility
 
             mScale.Xzy -= new Vector3(scaleReduction, scaleReduction, scaleReduction);
 
+            //Stops the particle getting a negative scale and getting huge
+            if (mScale.X < 0 || mScale.Y < 0 || mScale.Z < 0)
+            {
+                mAlive = false;
+            }
+            
             //Moves the particle
             mVelocity = mVelocity + ACWWindow.gravityAcceleration * mMovement_Time;
             mPosition = mPosition + mVelocity * mMovement_Time;
@@ -412,7 +418,7 @@ namespace Labs.ACW.Utility
             Vector3 velocity = mVelocity.Length * mNormal;
             velocity = Vector3.Transform(velocity, Matrix4.CreateRotationX(angle) * Matrix4.CreateRotationZ(angle));
             
-            return new SplashParticle(ACWWindow.mCubeModel, mParticle_LifeTime, mMaterial, -velocity * 0.4f, (new Vector3(1,1,1) * 0.3f), RandomizePosition());
+            return new SplashParticle(ACWWindow.mCubeModel, mParticle_LifeTime, mMaterial, -velocity * 0.4f, (new Vector3(1,1,1) * 0.6f), RandomizePosition());
         }
     }
     public class Splash

@@ -44,12 +44,6 @@ namespace Labs.ACW.Object
             RK4,
         }
         
-        //--------SPLASH SYSTEM CHARACTERISTICS--------//
-        int maxParticles = 20;
-        float particle_Life = 1f;
-        float squareSideSize = 0.5f;
-        //--------------------------------------------//
-
         public void Draw()
         {
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
@@ -156,7 +150,7 @@ namespace Labs.ACW.Object
                 s = CaculateSphereToStaticWallCollision(s);
 
                 //Colides with the Sphere of Doom
-                //s = CalculateSphereToSODCollision(s);
+                s = CalculateSphereToSODCollision(s);
             }
 
             return s;
@@ -373,25 +367,19 @@ namespace Labs.ACW.Object
         }
         private Sphere BottomPortal_CollisionAction(Sphere s)
         {
-            ACWWindow.splash.Add_System(new Utility.Splash_System(
-                    ACWWindow.mCubeModel, //Model
-                    new Vector3(s.mPosition.X, -20, s.mPosition.Z), //Position
-                    squareSideSize, //ZFar
-                    squareSideSize, //XRight
-                    0.001f, //Spawn rate
-                    particle_Life, //Particles life
-                    maxParticles, //Max particles
-                    0, //System life time
-                    s.mVelocity, //Velocity
-                    new Vector3(0, -1, 0), //Direction 
-                    20, //Angle
-                    s.material)); //Material
+            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), s.material, new Vector3(0, -1, 0));
             
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
             
             //Get it's distance and direction from the portal center
             float distance = (BottomPortalCentre - s.mPosition).Length;
+            if (distance + s.mRadius * 2 > 6)
+            {
+                //Debugging
+                Console.WriteLine("Possible catch when teleporting");
+            }
+
 
             Vector3 direction = (s.mPosition - BottomPortalCentre);
             direction.Normalize();
@@ -401,8 +389,11 @@ namespace Labs.ACW.Object
 
             //Apply new direction to other portal position and work out new balls position
             Vector3 newPosition = TopPortalCentre + (direction * distance);
-            s.mPosition = newPosition;
-            
+            //Flips in the Y axis
+            s.mPosition = Vector3.Transform(newPosition, Matrix4.CreateScale(1, 1, -1));
+
+            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), s.material, new Vector3(1, 0, 0));
+
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
 
@@ -410,13 +401,11 @@ namespace Labs.ACW.Object
         }
         private Sphere TopPortal_CollisionAction(Sphere s)
         {
-            ACWWindow.splash.Add_System(new Utility.Splash_System(
-                        ACWWindow.mCubeModel, new Vector3(4, s.mPosition.Y, s.mPosition.Z), squareSideSize, squareSideSize, 0.001f, particle_Life, maxParticles, 0, s.mVelocity, new Vector3(1, 0, 0), 40, s.material));
+            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), s.material, new Vector3(1, 0, 0));
 
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
-
-         
+            
             //Get it's distance and direction from the portal center
             float distance = (TopPortalCentre - s.mPosition).Length;
 
@@ -430,10 +419,31 @@ namespace Labs.ACW.Object
             Vector3 newPosition = BottomPortalCentre + (direction * distance);
             s.mPosition = newPosition;
 
+            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), s.material, new Vector3(0, -1, 0));
+
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ((float)Math.PI / 2));
             
             return s;
+        }
+
+        //--------SPLASH SYSTEM CHARACTERISTICS--------//
+        int maxParticles = 20;
+        float particle_Life = 1f;
+        float squareSideSize = 0.5f;
+        //--------------------------------------------//
+        private void SpawnSplash(Vector3 Position, Material Mat, Vector3 Direction)
+        {
+            //TRYING: Static velocity
+            ACWWindow.splash.Add_System(new Utility.Splash_System(ACWWindow.mCubeModel,
+                   Position, //Position
+                   squareSideSize, squareSideSize,
+                   0.001f, //Spawn rate
+                   particle_Life, //Particles life
+                   maxParticles, 0,
+                   new Vector3(10,10,10), Direction,
+                   20, //Spread
+                   Mat)); //Material
         }
 
         //Gravity calculation

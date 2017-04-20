@@ -7,25 +7,15 @@ using Labs.ACW.Object;
 using Labs.ACW.Utility;
 using System.Collections.Generic;
 using Labs.ACW.Textures;
-//-------------------------PARALLAX EFFECT------------------------------------//
-//X and Y rotation added, but when box is rotation views don't change,
-//Maybe I'm working out the current camera position incorrectly?
-//----------------------------------------------------------------------------//
-
-//TOP camera x axis is limited on one side more than the other?
-
 //==BUGS
-//==============================================================================================//
-//------------------------------------PORTAL EFFECT BUGS----------------------------------------//
-//TODO: Balls get stuck when passing through - Need to test why
-//TODO: Portal when rotating the world the view doesn't move the world does so the portal effect stays still when rotating
-//=============================================================================================//
+//TODO: Balls are getting stuck after transporting
+//TODO: Parallax is not working for the portals, the intended effect is when the camera view the portal view adapts
 
 //==FEATURES
-//TODO: Particle 4 Dimension fragmenting look for the portal
+//TODO: Going to a shiny rim to the portals like in Valves's portal
 //TODO: Look into having multiple shaders
 //TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
-//TODO: Add splash when the ball comes out the other end
+//TODO: Different splash animation for entering and leaving the portal
 
 namespace Labs.ACW
 {
@@ -53,6 +43,7 @@ namespace Labs.ACW
         public static float sphereLimit = 5;
         private Timer mTimer = new Timer(); //General timer
         private float viewDistance = 200;
+        private bool portalViewMovement = false;
 
         //Shaders
         public static ShaderUtility mShader; //Deals with lighting effects 
@@ -136,8 +127,11 @@ namespace Labs.ACW
         {
             timestep = mTimer.GetElapsedSeconds();
 
-            Portal_Camera();
-
+            if (portalViewMovement)
+            {
+                Portal_Camera();
+            }
+           
             Sphere.Update();
             Light.Update();
             Emitter.Update();
@@ -145,15 +139,14 @@ namespace Labs.ACW
             Camera.Update(camera);
             splash.Update();
             
-            //TODO: Turn into static method in the Particle class
             foreach (ParticleSystem sp in ActiveParticleSystems)
             {
                 sp.Update();
             }
 
             //Updates the portal views
-            mTopPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(-8, -11, 0) * Matrix4.CreateRotationY(-(float)Math.PI / 2) * Matrix4.CreateRotationZ(-(float)Math.PI / 2) * topRotation;
-            mBottomPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(2, 24, 0f) * Matrix4.CreateRotationX(-(float)Math.PI / 2) * bottomRotation;
+            mTopPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(-9, -15, 0) * Matrix4.CreateRotationY(-(float)Math.PI / 2) * Matrix4.CreateRotationZ(-(float)Math.PI / 2) * topRotation;
+            mBottomPortalView = Matrix4.Invert(mGroundModel) * Matrix4.CreateTranslation(0, 25, 0f) * Matrix4.CreateRotationX(-(float)Math.PI / 2) * bottomRotation;
 
 
         }  //Update
@@ -369,12 +362,7 @@ namespace Labs.ACW
             {
                 Camera.Type = CameraType.FollowItem;
             }
-            if (e.KeyChar == 'p')
-            {
-                camera.Reset();
-                Camera.Type = CameraType.PortalView;
-            }
-
+            
             //Gravity
             if (e.KeyChar == 'g')
             {
@@ -398,6 +386,12 @@ namespace Labs.ACW
                 control.Switch_Intergration();
             }
 
+            if (e.KeyChar == 'p')
+            {
+                //Inverts the bool
+                portalViewMovement = !portalViewMovement;
+            }
+
         }
         protected override void OnUnload(EventArgs e)
         {
@@ -418,13 +412,15 @@ namespace Labs.ACW
             GL.Viewport(0, 0, clientW, clientH);
             GL.BindVertexArray(mVAO[1]);
             //Draws all particle 
+
+            Texture.Unbind();
+            GL.Disable(EnableCap.CullFace);
             foreach (ParticleSystem sp in ActiveParticleSystems)
             {
                 sp.Draw();
             }
-
             GL.Enable(EnableCap.CullFace);
-            BrickWall.MakeActive();
+
 
             //Draws the Spheres
             GL.BindVertexArray(mVAO[0]);
@@ -433,7 +429,9 @@ namespace Labs.ACW
                 s.Draw();
             }
 
+         
             //SoD
+            Texture.Unbind();
             Level.DoomSphere.Apply_MaterialValues();
             Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.mRadius) * Matrix4.CreateTranslation(Level.DoomSphere.mPosition) * Level.Level3 * mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref DoomSphereLocation);
@@ -441,21 +439,23 @@ namespace Labs.ACW
 
             //Draws Cubes
             GL.BindVertexArray(mVAO[1]);
-            
+
+            BrickWall.MakeActive();
             Material.silver.Assign_Material();
             DrawTopBox(mBoxMatrix * mGroundModel * Level.Level0);
             DrawBox(mBoxMatrix * mGroundModel * Level.Level1);
             DrawBox(mBoxMatrix * mGroundModel * Level.Level2);
             DrawBottomBox(mBoxMatrix * mGroundModel * Level.Level3);
-
+            
+             //This stops the back of cylinders from not being drawn
+            GL.Disable(EnableCap.CullFace);
+            Texture.Unbind();
             //Draws the splash particle effect
             splash.Draw();
             
-            //This stops the back of cylinders from not being drawn
-            GL.Disable(EnableCap.CullFace);
-            
             //Draws Cylinders
             GL.BindVertexArray(mVAO[2]);
+           
             foreach (Cylinder c in Level.Level1_Cylinders) //LEVEL 1
             {
                 Level.Draw_Cylinders(c, Level.Level1);
@@ -464,8 +464,6 @@ namespace Labs.ACW
             {
                 Level.Draw_Cylinders(c, Level.Level2);
             }
-            
-            OutputDetails.Update();
         }
         private void DrawBox(Matrix4 BoxPosition)
         {
@@ -592,7 +590,7 @@ namespace Labs.ACW
             Frame_Buffer.Unbind_Buffer();
         }
 
-        //Poral viewing angles
+        //Portal viewing angles
         private void Portal_ViewportUpdate()
         {
             GL.Viewport(0, 0, Bottom_Portal.mWidth, Bottom_Portal.mHeight);
@@ -616,17 +614,18 @@ namespace Labs.ACW
             angle = Math.Sin(adjacent / opposite);
             topRotation *= Matrix4.CreateRotationX(Angle_Limit(angle, 20));
             
-            //TOP - Y
-            opposite = topPortalPosition.Y - currentCameraPosition.Y;
-            adjacent = topPortalPosition.Z - currentCameraPosition.Z;
-            angle = Math.Sin(opposite / adjacent);
-            bottomRotation = Matrix4.CreateRotationX(Angle_Limit(angle, 20));
+            //TODO: NOT WORKING
+            ////TOP - Y
+            //opposite = topPortalPosition.Y - currentCameraPosition.Y;
+            //adjacent = topPortalPosition.Z - currentCameraPosition.Z;
+            //angle = Math.Sin(opposite / adjacent);
+            //bottomRotation = Matrix4.CreateRotationX(Angle_Limit(angle, 20));
             
-            //TOP - X
-            opposite = topPortalPosition.Z - currentCameraPosition.Z;
-            adjacent = topPortalPosition.X - currentCameraPosition.X;
-            angle = Math.Sin(adjacent / opposite);
-            bottomRotation *= Matrix4.CreateRotationY(Angle_Limit(angle, 10));
+            ////TOP - X
+            //opposite = topPortalPosition.Z - currentCameraPosition.Z;
+            //adjacent = topPortalPosition.X - currentCameraPosition.X;
+            //angle = Math.Sin(adjacent / opposite);
+            //bottomRotation *= Matrix4.CreateRotationY(Angle_Limit(angle, 20));
         }
         private float Angle_Limit(double angle, double limit)
         {

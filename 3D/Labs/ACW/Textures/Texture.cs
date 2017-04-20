@@ -63,5 +63,10 @@ namespace Labs.ACW.Textures
             GL.DeleteTexture(mTextureID);
         }
         
+        public static void Unbind()
+        {
+            int uTextureSamplerLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "TextureSampler");
+            GL.Uniform1(uTextureSamplerLocation, 0);
+        }
     }
 }

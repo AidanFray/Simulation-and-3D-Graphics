@@ -34,8 +34,10 @@ namespace Labs.ACW
             
             //Changes to lights done here
             mLights.Add(new Light(new Vector3(0, 0, 0), new Vector3(1, 1, 0)));
-            mLights.Add(new Light(new Vector3(0, 15, 0), new Vector3(0, 1, 1)));
-            mLights.Add(new Light(new Vector3(0, -15, 0), new Vector3(1, 0, 1)));
+            mLights.Add(new Light(new Vector3(0, 15, 0), new Vector3(1, 0, 1)));
+            //mLights.Add(new Light(new Vector3(0, -15, 0), new Vector3(1, 0, 1)));
+            mLights.Add(new Light(new Vector3(1, -18, 0), new Vector3(0, 1, 1)));
+
 
             for (int i = 0; i < mLights.Count; i++)
             {
