@@ -374,10 +374,17 @@ namespace Labs.ACW.Object
             
             //Get it's distance and direction from the portal center
             float distance = (BottomPortalCentre - s.mPosition).Length;
-            if (distance + s.mRadius * 2 > 6)
+            if (distance + s.mRadius * 2 > 5)
             {
-                //Debugging
-                Console.WriteLine("Possible catch when teleporting");
+                //Moves the distance away from the wall
+                if (distance < 0)
+                {
+                    distance += 0.3f;
+                }
+                else
+                {
+                    distance -= 0.3f;
+                }
             }
 
 

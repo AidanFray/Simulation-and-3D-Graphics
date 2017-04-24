@@ -7,10 +7,6 @@ using Labs.ACW.Object;
 using Labs.ACW.Utility;
 using System.Collections.Generic;
 using Labs.ACW.Textures;
-//==BUGS
-//TODO: Balls are getting stuck after transporting
-//TODO: Parallax is not working for the portals, the intended effect is when the camera view the portal view adapts
-
 //==FEATURES
 //TODO: Make the portal particle materials the portal materials
 //TODO: Look into having multiple shaders
@@ -43,7 +39,7 @@ namespace Labs.ACW
         public static float sphereLimit = 5;
         private Timer mTimer = new Timer(); //General timer
         private float viewDistance = 200;
-        private bool portalViewMovement = false;
+        private bool portalViewMovement = true;
 
         //Shaders
         public static ShaderUtility mShader; //Deals with lighting effects 
