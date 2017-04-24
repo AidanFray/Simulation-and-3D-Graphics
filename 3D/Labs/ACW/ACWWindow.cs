@@ -12,7 +12,7 @@ using Labs.ACW.Textures;
 //TODO: Parallax is not working for the portals, the intended effect is when the camera view the portal view adapts
 
 //==FEATURES
-//TODO: Going to a shiny rim to the portals like in Valves's portal
+//TODO: Make the portal particle materials the portal materials
 //TODO: Look into having multiple shaders
 //TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
 //TODO: Different splash animation for entering and leaving the portal
@@ -92,7 +92,7 @@ namespace Labs.ACW
         {
         }
 
-        //-------------------------Main Methods--------------------------------//
+        //Main Methods
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -403,8 +403,7 @@ namespace Labs.ACW
 
             base.OnUnload(e);
         }
-        //---------------------------------------------------------------------//
-        
+       
         //Renders the scene
         public void Render_Objects()
         {
@@ -428,8 +427,7 @@ namespace Labs.ACW
             {
                 s.Draw();
             }
-
-         
+            
             //SoD
             Texture.Unbind();
             Level.DoomSphere.Apply_MaterialValues();
@@ -446,7 +444,10 @@ namespace Labs.ACW
             DrawBox(mBoxMatrix * mGroundModel * Level.Level1);
             DrawBox(mBoxMatrix * mGroundModel * Level.Level2);
             DrawBottomBox(mBoxMatrix * mGroundModel * Level.Level3);
-            
+
+            DrawBottomPortalOutline();
+            DrawTopPortalOutline();
+
              //This stops the back of cylinders from not being drawn
             GL.Disable(EnableCap.CullFace);
             Texture.Unbind();
@@ -475,7 +476,6 @@ namespace Labs.ACW
             GL.UniformMatrix4(uModelLocation, true, ref BoxPosition);
             GL.DrawElements(BeginMode.Triangles, 12, DrawElementsType.UnsignedInt, 0); //Front and Back
 
-            //TODO: Change to bottom portal view
             Material.silver.Assign_Material();
             Top_Portal.Make_Active_Texture();
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //RightSide
@@ -497,6 +497,65 @@ namespace Labs.ACW
 
         } //Missed the top section
        
+        //Adds outlines to the portal
+        private void DrawBottomPortalOutline()
+        {
+            //Material Value
+            BrickWall.MakeActive();
+            Material.portal_Blue.Assign_Material();
+            float height = -20.25f;
+
+            //Left
+            Matrix4 Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(-3.9f, height, 0));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
+
+            //Back
+            Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(-4.9f, height, -1f)) * Matrix4.CreateRotationY(-(float)Math.PI/2);
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
+
+            //Right
+            Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(5.9f, height, 0));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
+
+            //Front
+            Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(4.9f, height, -1f)) * Matrix4.CreateRotationY(-(float)Math.PI / 2);
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
+        }
+        private void DrawTopPortalOutline()
+        {
+            //Material Value
+            BrickWall.MakeActive();
+            Material.portal_Orange.Assign_Material();
+
+            float x = 5.7f;
+
+            //Top
+            Matrix4 Side = Matrix4.CreateScale(new Vector3(1, 0.5f, 25f)) * Matrix4.CreateTranslation(new Vector3(x, 19.4f, 0));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //Top
+
+            //Bottom
+            Side = Matrix4.CreateScale(new Vector3(1, 0.5f, 25f)) * Matrix4.CreateTranslation(new Vector3(x, 9.4f, 0));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //Top
+
+            //Left
+            Side = Matrix4.CreateScale(new Vector3(1, 25f, 0.5f)) * Matrix4.CreateTranslation(new Vector3(x, 14.4f, -4.9f));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //Top
+
+            //Right
+            Side = Matrix4.CreateScale(new Vector3(1, 25f, 0.5f)) * Matrix4.CreateTranslation(new Vector3(x, 14.4f, 4.9f));
+            GL.UniformMatrix4(uModelLocation, true, ref Side);
+            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //Top
+
+            //Left
+        }
+
         //Renders to Texture
         private void RenderToTexture_Bottom_Portal()
         {

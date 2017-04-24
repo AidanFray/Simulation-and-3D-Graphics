@@ -19,7 +19,8 @@ namespace Labs.ACW
 
         public static Material white = new Material(new Vector3(1,1,1), new Vector3(1,1,1), new Vector3(1,1,1), 0);
 
-        public static Material portal_Blue = new Material(new Vector3(0.0f, 0.4f, 0.7f), new Vector3(0.32f, 0.35f, 0.42f), new Vector3(1,1,1), 10);
+        public static Material portal_Blue = new Material(new Vector3(0.0f, 0.4f, 1f), new Vector3(0.32f, 0.35f, 1f), new Vector3(0,0,1), 1);
+        public static Material portal_Orange = new Material(new Vector3(0.50f, 0.1995f, 0.0f), new Vector3(0.50f, 0.1995f, 0.0f), new Vector3(0.50f, 0.1995f, 0.0f), 1);
 
         public Vector3 mAmbient;
         public Vector3 mDiffuse;
