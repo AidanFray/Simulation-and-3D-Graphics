@@ -7,11 +7,14 @@ using Labs.ACW.Object;
 using Labs.ACW.Utility;
 using System.Collections.Generic;
 using Labs.ACW.Textures;
+
 //==FEATURES
-//TODO: Make the portal particle materials the portal materials
 //TODO: Look into having multiple shaders
+    //-Doing collisions in the shader
 //TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
 //TODO: Different splash animation for entering and leaving the portal
+
+//TODO: Work out viewing angle for the top portal
 
 namespace Labs.ACW
 {

@@ -367,7 +367,9 @@ namespace Labs.ACW.Object
         }
         private Sphere BottomPortal_CollisionAction(Sphere s)
         {
-            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), s.material, new Vector3(0, -1, 0));
+            Material Mat = Translate_Material(s.material);
+
+            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), Mat, new Vector3(0, -1, 0));
             
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
@@ -399,7 +401,7 @@ namespace Labs.ACW.Object
             //Flips in the Y axis
             s.mPosition = Vector3.Transform(newPosition, Matrix4.CreateScale(1, 1, -1));
 
-            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), s.material, new Vector3(1, 0, 0));
+            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), Mat, new Vector3(1, 0, 0));
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ(-(float)Math.PI / 2));
@@ -408,7 +410,9 @@ namespace Labs.ACW.Object
         }
         private Sphere TopPortal_CollisionAction(Sphere s)
         {
-            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), s.material, new Vector3(1, 0, 0));
+            Material Mat = Translate_Material(s.material);
+
+            SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), Mat, new Vector3(1, 0, 0));
 
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
@@ -426,12 +430,27 @@ namespace Labs.ACW.Object
             Vector3 newPosition = BottomPortalCentre + (direction * distance);
             s.mPosition = newPosition;
 
-            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), s.material, new Vector3(0, -1, 0));
+            SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), Mat, new Vector3(0, -1, 0));
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ((float)Math.PI / 2));
             
             return s;
+        }
+
+        private Material Translate_Material(Material s)
+        {
+            //Translates portal materials over
+            Material Mat;
+            if (s == Material.doger_Blue)
+            {
+                Mat = Material.portal_Blue;
+            }
+            else
+            {
+                Mat = Material.portal_Orange;
+            }
+            return Mat;
         }
 
         //--------SPLASH SYSTEM CHARACTERISTICS--------//
