@@ -32,7 +32,7 @@ namespace Labs.ACW.Object
         public static Sphere Orange_Sphere = new Sphere(new Vector3(0.5f, 15, 0.5f), new Vector3(3, 2, 0), Unit.ConvertToCm(8), 1400f, Material.matt_Orange); //cm and cm3
         public static Sphere Blue_Sphere = new Sphere(new Vector3(-1, 15, 0), new Vector3(-3, 0, -3), Unit.ConvertToCm(6), 0.001f, Material.doger_Blue);
         public static List<Sphere> DrawList = new List<Sphere>(); //The static list of spheres to draw
-        
+
         static float totalTime = 0; //Used for integration value debugging
 
         //Used to switch between the ways gravity is calculated
@@ -43,7 +43,7 @@ namespace Labs.ACW.Object
             Implicit_Euler,
             RK4,
         }
-        
+
         public void Draw()
         {
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
@@ -55,8 +55,7 @@ namespace Labs.ACW.Object
             GL.UniformMatrix4(uModelLocation, true, ref SphereLocation);
             GL.DrawElements(BeginMode.Triangles, ACWWindow.mSphereModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
-
-        //TODO: add AABB collision to Cylinder 
+        
         public static void Update()
         {
             OutOfRangeCheck();
@@ -155,7 +154,7 @@ namespace Labs.ACW.Object
 
             return s;
         }
-        
+
         //Collision
         private Sphere CaculateSphereToStaticWallCollision(Sphere s)
         {
@@ -167,8 +166,8 @@ namespace Labs.ACW.Object
             else
             {
                 //Other portal
-                if (s.mPosition.X + s.mRadius >= 0.2f * ACWWindow.mContainerMatrix.ExtractScale().X && 
-                    (Level.Level0.ExtractTranslation().Y - 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) <= s.mPosition.Y && 
+                if (s.mPosition.X + s.mRadius >= 0.2f * ACWWindow.mContainerMatrix.ExtractScale().X &&
+                    (Level.Level0.ExtractTranslation().Y - 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) <= s.mPosition.Y &&
                     (Level.Level0.ExtractTranslation().Y + 0.2f * ACWWindow.mBoxMatrix.ExtractScale().Y) >= s.mPosition.Y)
                 {
                     s = TopPortal_CollisionAction(s);
@@ -243,7 +242,7 @@ namespace Labs.ACW.Object
             {
                 SpotLight.SpotLights[0].mColour -= FlashColour / 100;
             }
-            
+
             if (distance < radius)
             {
                 float reduction_Speed = 0.03f;
@@ -272,16 +271,23 @@ namespace Labs.ACW.Object
         }
         private Sphere CalculateSphereCylinderCollision(Sphere s)
         {
-            //TODO: Optimize to just check on what level the balls are on
-            foreach (Cylinder c in Level.Level1_Cylinders)
+            //Checks if the balls could be above the center therefore only could colides with level 1
+            if (mPosition.Y > 0)
             {
-                s = CollisionCylinder(c, s, Level.Level1);
+                foreach (Cylinder c in Level.Level1_Cylinders)
+                {
+                    s = CollisionCylinder(c, s, Level.Level1);
+                }
             }
-            foreach (Cylinder c in Level.Level2_Cylinders)
+            //If ball is bellow the center the balls could only colides with level 2
+            else
             {
-                s = CollisionCylinder(c, s, Level.Level2);
+                foreach (Cylinder c in Level.Level2_Cylinders)
+                {
+                    s = CollisionCylinder(c, s, Level.Level2);
+                }
             }
-
+            
             return s;
         }
         private Vector3 CalculateVelocity(Vector3 normal, Vector3 velocity)
@@ -370,10 +376,10 @@ namespace Labs.ACW.Object
             Material Mat = Translate_Material(s.material);
 
             SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), Mat, new Vector3(0, -1, 0));
-            
+
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
-            
+
             //Get it's distance and direction from the portal center
             float distance = (BottomPortalCentre - s.mPosition).Length;
             if (distance + s.mRadius * 2 > 5)
@@ -416,7 +422,7 @@ namespace Labs.ACW.Object
 
             Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
             Vector3 TopPortalCentre = new Vector3(4, 15, 0);
-            
+
             //Get it's distance and direction from the portal center
             float distance = (TopPortalCentre - s.mPosition).Length;
 
@@ -434,7 +440,7 @@ namespace Labs.ACW.Object
 
             //Changes the velocity direction
             s.mVelocity = Vector3.Transform(s.mVelocity, Matrix4.CreateRotationZ((float)Math.PI / 2));
-            
+
             return s;
         }
 
@@ -467,7 +473,7 @@ namespace Labs.ACW.Object
                    0.001f, //Spawn rate
                    particle_Life, //Particles life
                    maxParticles, 0,
-                   new Vector3(10,10,10), Direction,
+                   new Vector3(10, 10, 10), Direction,
                    20, //Spread
                    Mat)); //Material
         }
@@ -520,47 +526,47 @@ namespace Labs.ACW.Object
             Derivative a, b, c, d;
 
             State state;
-            state.v = s.mVelocity;
-            state.x = s.mPosition;
+            state.velocity = s.mVelocity;
+            state.position = s.mPosition;
 
-            a = evaluate(ref state, 0, dt, new Derivative());
-            b = evaluate(ref state, 0, dt * 0.5f, a);
-            c = evaluate(ref state, 0, dt * 0.5f, b);
-            d = evaluate(ref state, 0, dt * 0.5f, c);
+            a = Evaluate(ref state, 0, dt, new Derivative());
+            b = Evaluate(ref state, 0, dt * 0.5f, a);
+            c = Evaluate(ref state, 0, dt * 0.5f, b);
+            d = Evaluate(ref state, 0, dt * 0.5f, c);
 
-            Vector3 dxdt = 1.0f / 6.0f * (a.dx + 2.0f * (b.dx + c.dx) + d.dx);
+            Vector3 dxdt = 1.0f / 6.0f * (a.d_velocity + 2.0f * (b.d_velocity + c.d_velocity) + d.d_velocity);
 
-            state.x = state.x + dxdt * dt;
-            state.v = state.v + ACWWindow.gravityAcceleration * dt;
+            state.position = state.position + dxdt * dt;
+            state.velocity = state.velocity + ACWWindow.gravityAcceleration * dt;
 
             s.mOldPosition = s.mPosition;
 
 
-            s.mPosition = state.x;
-            s.mVelocity = state.v;
+            s.mPosition = state.position;
+            s.mVelocity = state.velocity;
 
             return s;
-        } //TODO: Tidy RK4
-        private Derivative evaluate(ref State initial, float t, float dt, Derivative d)
+        }
+        private Derivative Evaluate(ref State initial, float t, float dt, Derivative d)
         {
             State state;
-            state.x = initial.x + d.dx * dt;
-            state.v = initial.v + d.dv * dt;
+            state.position = initial.position + d.d_velocity * dt;
+            state.velocity = initial.velocity + d.d_acceleration * dt;
 
             Derivative output;
-            output.dx = state.v;
-            output.dv = ACWWindow.gravityAcceleration;
+            output.d_velocity = state.velocity;
+            output.d_acceleration = ACWWindow.gravityAcceleration;
             return output;
         }
         struct State
         {
-            public Vector3 x;
-            public Vector3 v;
+            public Vector3 position;
+            public Vector3 velocity;
         }
         struct Derivative
         {
-            public Vector3 dx;
-            public Vector3 dv;
+            public Vector3 d_velocity;
+            public Vector3 d_acceleration;
         }
     }
 }

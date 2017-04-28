@@ -154,9 +154,7 @@ namespace Labs.ACW
             //Init
             GL.ClearColor(Color4.Black);
             GL.Enable(EnableCap.DepthTest);
-
-            //WindowState = WindowState.Fullscreen;
-
+            
             Camera.Type = CameraType.Static;
 
             mShader = new ShaderUtility(@"ACW/Shaders/s.vert", @"ACW/Shaders/Light.frag");
@@ -176,10 +174,10 @@ namespace Labs.ACW
             GL.GenVertexArrays(mVAO.Length, mVAO);
             GL.GenBuffers(mVBO.Length, mVBO);
 
-            //Loading Textures and Frame buffers
-            //TODO: Delete textures from memory
+            //Textures
             BrickWall = new Texture(@"ACW/Textures/BrickWall.jpg", TextureUnit.Texture0);
-            //ConcreteWall = new Texture(@"ACW/Textures/ConcreteWall.jpg", TextureUnit.Texture1);
+
+            //Frame buffers
             Bottom_Portal = new Frame_Buffer(TextureUnit.Texture2, FramebufferAttachment.ColorAttachment0);
             Top_Portal = new Frame_Buffer(TextureUnit.Texture3, FramebufferAttachment.ColorAttachment0);
 
@@ -389,6 +387,18 @@ namespace Labs.ACW
             {
                 //Inverts the bool
                 portalViewMovement = !portalViewMovement;
+            }
+
+            if (e.KeyChar == 'f')
+            {
+                if (WindowState == WindowState.Fullscreen)
+                {
+                    WindowState = WindowState.Normal;
+                }
+                else
+                {
+                    WindowState = WindowState.Fullscreen;
+                }
             }
 
         }
@@ -672,13 +682,12 @@ namespace Labs.ACW
             angle = Math.Sin(adjacent / opposite);
             topRotation *= Matrix4.CreateRotationX(Angle_Limit(angle, 20));
             
-            //TODO: NOT WORKING
             ////TOP - Y
             //opposite = topPortalPosition.Y - currentCameraPosition.Y;
             //adjacent = topPortalPosition.Z - currentCameraPosition.Z;
             //angle = Math.Sin(opposite / adjacent);
             //bottomRotation = Matrix4.CreateRotationX(Angle_Limit(angle, 20));
-            
+
             ////TOP - X
             //opposite = topPortalPosition.Z - currentCameraPosition.Z;
             //adjacent = topPortalPosition.X - currentCameraPosition.X;
