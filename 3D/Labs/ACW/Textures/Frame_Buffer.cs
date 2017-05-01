@@ -33,13 +33,11 @@ namespace Labs.ACW
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, mWidth, mHeight, 0, PixelFormat.Rgb, PixelType.UnsignedByte, (IntPtr)null);
            
-             
-            ////Depth buffer
+            //Depth buffer
             GL.GenRenderbuffers(1, out mDepthbuffer_ID);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, mDepthbuffer_ID);
             GL.RenderbufferStorage(RenderbufferTarget.Renderbuffer, RenderbufferStorage.DepthComponent24, mWidth, mHeight);
           
-            
             //Creates the FB Object
             GL.GenFramebuffers(1, out mFramebuffer_ID);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, mFramebuffer_ID);
@@ -48,8 +46,7 @@ namespace Labs.ACW
                                     TextureTarget.Texture2D, 
                                     mFramebufferTexture_ID, 
                                     0);
-
-
+            
             //Creates the Render buffer
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer,
                                        FramebufferAttachment.DepthAttachment,

@@ -10,12 +10,12 @@ using Labs.ACW.Textures;
 
 //==FEATURES
 //TODO: Look into having multiple shaders
-    //-Doing collisions in the shader
-//TODO: Optimization: Check which level the ball in and just check that levels cylinder/sod
+//-Doing collisions in the shader
+
 //TODO: Different splash animation for entering and leaving the portal
 
-//TODO: Work out viewing angle for the top portal
-
+//TODO: Adding fractals into portal splash. Idea obtained from: "Fractals - Hunting the Hidden Dimension"
+    //-The idea is each particle is a splash system
 namespace Labs.ACW
 {
     public class ACWWindow : GameWindow
@@ -389,7 +389,7 @@ namespace Labs.ACW
                 portalViewMovement = !portalViewMovement;
             }
 
-            if (e.KeyChar == 'f')
+            if (e.KeyChar == '1')
             {
                 if (WindowState == WindowState.Fullscreen)
                 {
@@ -665,10 +665,10 @@ namespace Labs.ACW
         }
         private void Portal_Camera()
         {
-            Vector3 currentCameraPosition = Vector3.Transform(new Vector3(0, 0, 0), mView);
+            Vector3 currentCameraPosition = Vector3.Transform(new Vector3(1, 1, 1), mView);
             
             Vector3 bottomPortalPosition = new Vector3(0, -20, 0);
-            Vector3 topPortalPosition = new Vector3(8, -18, 0);
+            Vector3 topPortalPosition = new Vector3(0, -18, 0);
             
             //BOTTOM - Y
             double opposite = bottomPortalPosition.Y - currentCameraPosition.Y;
@@ -682,17 +682,17 @@ namespace Labs.ACW
             angle = Math.Sin(adjacent / opposite);
             topRotation *= Matrix4.CreateRotationX(Angle_Limit(angle, 20));
             
-            ////TOP - Y
-            //opposite = topPortalPosition.Y - currentCameraPosition.Y;
-            //adjacent = topPortalPosition.Z - currentCameraPosition.Z;
-            //angle = Math.Sin(opposite / adjacent);
-            //bottomRotation = Matrix4.CreateRotationX(Angle_Limit(angle, 20));
+            //TOP - Y
+            opposite = topPortalPosition.Y - currentCameraPosition.Y;
+            adjacent = topPortalPosition.Z - currentCameraPosition.Z;
+            angle = Math.Sin(opposite / adjacent);
+            bottomRotation = Matrix4.CreateRotationX(Angle_Limit(angle, 15));
 
             ////TOP - X
-            //opposite = topPortalPosition.Z - currentCameraPosition.Z;
-            //adjacent = topPortalPosition.X - currentCameraPosition.X;
-            //angle = Math.Sin(adjacent / opposite);
-            //bottomRotation *= Matrix4.CreateRotationY(Angle_Limit(angle, 20));
+            opposite = topPortalPosition.Z - currentCameraPosition.Z;
+            adjacent = topPortalPosition.X - currentCameraPosition.X;
+            angle = Math.Sin(adjacent / opposite);
+            bottomRotation *= Matrix4.CreateRotationY(Angle_Limit(angle, 15));
         }
         private float Angle_Limit(double angle, double limit)
         {
