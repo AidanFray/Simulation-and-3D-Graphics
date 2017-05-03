@@ -38,7 +38,7 @@ namespace Labs.ACW
             c.Apply_MaterialValues();
             Matrix4 cylinderPos = c.TranslationMatrix * Level * ACWWindow.mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref cylinderPos);
-            GL.DrawElements(BeginMode.Triangles, ACWWindow.mCylinderModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(ACWWindow.DrawMode, ACWWindow.mCylinderModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
     }
 }

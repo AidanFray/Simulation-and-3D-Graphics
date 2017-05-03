@@ -76,6 +76,9 @@ namespace Labs.ACW
         public static Matrix4 topRotation = Matrix4.CreateRotationY(0);
         public static Matrix4 bottomRotation = Matrix4.CreateRotationY(0);
 
+        //Switches between draw modes
+        public static BeginMode DrawMode = BeginMode.Triangles;
+
         public ACWWindow()
             : base(
                 1000, // Width
@@ -410,6 +413,18 @@ namespace Labs.ACW
                 Emitter.Init();
             }
 
+            if (e.KeyChar == '.')
+            {
+                if (DrawMode == BeginMode.Triangles)
+                {
+                    DrawMode = BeginMode.LineStrip;
+                }
+                else
+                {
+                    DrawMode = BeginMode.Triangles;
+                }
+            }
+
         }
         protected override void OnUnload(EventArgs e)
         {
@@ -451,7 +466,7 @@ namespace Labs.ACW
             Level.DoomSphere.Apply_MaterialValues();
             Matrix4 DoomSphereLocation = Matrix4.CreateScale(Level.DoomSphere.mRadius) * Matrix4.CreateTranslation(Level.DoomSphere.mPosition) * Level.Level3 * mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref DoomSphereLocation);
-            GL.DrawElements(BeginMode.Triangles, mSphereModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(DrawMode, mSphereModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
 
             //Draws Cubes
             GL.BindVertexArray(mVAO[1]);
@@ -487,31 +502,31 @@ namespace Labs.ACW
         private void DrawBox(Matrix4 BoxPosition)
         {
             GL.UniformMatrix4(uModelLocation, true, ref BoxPosition);
-            GL.DrawElements(BeginMode.Triangles, mCubeModel.Indices.Length - 12, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(DrawMode, mCubeModel.Indices.Length - 12, DrawElementsType.UnsignedInt, 0);
         } //Doesn't draw top and bottom sections
         private void DrawTopBox(Matrix4 BoxPosition)
         {
             GL.UniformMatrix4(uModelLocation, true, ref BoxPosition);
-            GL.DrawElements(BeginMode.Triangles, 12, DrawElementsType.UnsignedInt, 0); //Front and Back
+            GL.DrawElements(DrawMode, 12, DrawElementsType.UnsignedInt, 0); //Front and Back
 
             Material.silver.Assign_Material();
             Top_Portal.Make_Active_Texture();
-            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //RightSide
+            GL.DrawElements(DrawMode, 6, DrawElementsType.UnsignedInt, 12 * sizeof(float)); //RightSide
 
             BrickWall.MakeActive();
-            GL.DrawElements(BeginMode.Triangles, mCubeModel.Indices.Length - 24, DrawElementsType.UnsignedInt, 18 * sizeof(float)); //Rest
+            GL.DrawElements(DrawMode, mCubeModel.Indices.Length - 24, DrawElementsType.UnsignedInt, 18 * sizeof(float)); //Rest
 
 
         } //Misses the bottom section
         private void DrawBottomBox(Matrix4 BoxPosition)
         {
             GL.UniformMatrix4(uModelLocation, true, ref BoxPosition);
-            GL.DrawElements(BeginMode.Triangles, mCubeModel.Indices.Length - 12, DrawElementsType.UnsignedInt, 0); //Side sections
+            GL.DrawElements(DrawMode, mCubeModel.Indices.Length - 12, DrawElementsType.UnsignedInt, 0); //Side sections
 
             Material.silver.Assign_Material();
 
             Bottom_Portal.Make_Active_Texture();
-            GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 30 * sizeof(float)); //Bottom
+            GL.DrawElements(DrawMode, 6, DrawElementsType.UnsignedInt, 30 * sizeof(float)); //Bottom
 
         } //Missed the top section
        

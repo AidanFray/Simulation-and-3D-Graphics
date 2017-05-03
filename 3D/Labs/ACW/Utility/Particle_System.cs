@@ -255,7 +255,7 @@ namespace Labs.ACW.Utility
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
             Matrix4 LocationMatrix = Matrix4.CreateScale(mScale) * Matrix4.CreateTranslation(mPosition) * ACWWindow.mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref LocationMatrix);
-            GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(ACWWindow.DrawMode, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         public override void Update()
@@ -287,7 +287,7 @@ namespace Labs.ACW.Utility
             int uModelLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uModel");
             Matrix4 LocationMatrix = Matrix4.CreateScale(mScale) * Matrix4.CreateTranslation(mPosition) * ACWWindow.mGroundModel;
             GL.UniformMatrix4(uModelLocation, true, ref LocationMatrix);
-            GL.DrawElements(BeginMode.Triangles, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(ACWWindow.DrawMode, mModel.Indices.Length, DrawElementsType.UnsignedInt, 0);
         }
 
         float scaleReduction = 0.01f;
