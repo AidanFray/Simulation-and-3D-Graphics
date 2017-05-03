@@ -7,6 +7,10 @@ namespace Labs.ACW
 {
     class Emitter
     {
+        //For crazy mode
+        public static bool crazyMode = false;
+        //
+
         public static List<Emitter> mEmitterList = new List<Emitter>();
         private Timer mSpawnTimer = new Timer();
 
@@ -40,10 +44,19 @@ namespace Labs.ACW
         //Used to create and initalise the emitters
         public static void Init()
         {
-            mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 1f, Sphere.Blue_Sphere, true));
-            mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 2f, Sphere.Orange_Sphere, true));
-
-            //EmitterList.Add(new Emitter(new Vector3(-4, 18, -4), 10, Sphere.Orange_Sphere, false));
+            mEmitterList.Clear();
+            if (crazyMode == true)
+            {
+                mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 1f, Sphere.Blue_Sphere, true));
+                mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 2f, Sphere.Orange_Sphere, true));
+                mEmitterList.Add(new Emitter(new Vector3(-4, 18, -4), 0.5f, Sphere.Orange_Sphere, true));
+            }   
+            else
+            {
+                mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 2f, Sphere.Blue_Sphere, true));
+                mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 4f, Sphere.Orange_Sphere, true));
+            }
+            
         }
 
         public static void Update()

@@ -39,7 +39,7 @@ namespace Labs.ACW
         public static bool gravityOn;
         public static float E = 0.8f;
         public static float timestep;
-        public static float sphereLimit = 20;
+        public static float sphereLimit = 100;
         private Timer mTimer = new Timer(); //General timer
         private float viewDistance = 200;
         private bool portalViewMovement = true;
@@ -136,6 +136,7 @@ namespace Labs.ACW
             Emitter.Update();
             SpotLight.Update();
             Camera.Update(camera);
+            OutputDetails.Update();
             splash.Update();
             
             foreach (ParticleSystem sp in ActiveParticleSystems)
@@ -399,6 +400,14 @@ namespace Labs.ACW
                 {
                     WindowState = WindowState.Fullscreen;
                 }
+            }
+
+            if (e.KeyChar == '#')
+            {
+                Emitter.crazyMode = !Emitter.crazyMode;
+
+                //Inverts the mode
+                Emitter.Init();
             }
 
         }

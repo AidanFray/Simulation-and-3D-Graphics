@@ -308,7 +308,7 @@ namespace Labs.ACW.Object
 
             Vector3 Cp = s.mPosition;
 
-            //Parrell position on the square
+            //Parallel position on the square
             Vector3 A = (Vector3.Dot((Cp - L2p), SquareSideDirection) * SquareSideDirection);
             float AStrength = (Vector3.Dot((Cp - L2p), SquareSideDirection));
 
@@ -383,20 +383,11 @@ namespace Labs.ACW.Object
 
             //Get it's distance and direction from the portal center
             float distance = (BottomPortalCentre - s.mPosition).Length;
-            if (distance + s.mRadius * 2 > 5)
+            if (distance + s.mRadius > 6)
             {
-                //Moves the distance away from the wall
-                if (distance < 0)
-                {
-                    distance += 0.3f;
-                }
-                else
-                {
-                    distance -= 0.3f;
-                }
+                distance = 6 - s.mRadius;
             }
-
-
+            
             Vector3 direction = (s.mPosition - BottomPortalCentre);
             direction.Normalize();
 
@@ -426,6 +417,10 @@ namespace Labs.ACW.Object
 
             //Get it's distance and direction from the portal center
             float distance = (TopPortalCentre - s.mPosition).Length;
+            if (distance + s.mRadius > 6)
+            {
+                distance = 6 - s.mRadius;
+            }
 
             Vector3 direction = (s.mPosition - TopPortalCentre);
             direction.Normalize();

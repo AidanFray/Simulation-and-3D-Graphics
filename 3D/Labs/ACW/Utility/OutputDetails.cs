@@ -28,6 +28,7 @@ namespace Labs.ACW
                 currentTime = 0;
 
                 Console.WriteLine("Current Integration Method: " + Sphere.intergration.ToString());
+                Console.WriteLine("Crazy mode: " + Emitter.crazyMode.ToString());
             }
         }
     }
