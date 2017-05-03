@@ -20,12 +20,9 @@ namespace Labs.ACW
 {
     public class ACWWindow : GameWindow
     {
-        //Camera and user control classes
-        Camera camera = new Camera();
-        Control control = new Control();
-
         //Controls the splash animation
         public static Splash splash = new Splash();
+        public static Camera camera = new Camera();
 
         //Various Floating cub systems
         List<Floating_CubeSystem> ActiveParticleSystems = new List<Floating_CubeSystem>();
@@ -42,7 +39,6 @@ namespace Labs.ACW
         public static float sphereLimit = 100;
         private Timer mTimer = new Timer(); //General timer
         private float viewDistance = 200;
-        private bool portalViewMovement = true;
 
         //Shaders
         public static ShaderUtility mShader; //Deals with lighting effects 
@@ -129,11 +125,8 @@ namespace Labs.ACW
         {
             timestep = mTimer.GetElapsedSeconds();
 
-            if (portalViewMovement)
-            {
                 Portal_Camera();
-            }
-           
+          
             Sphere.Update();
             Light.Update();
             Emitter.Update();
@@ -341,58 +334,9 @@ namespace Labs.ACW
         }
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
-            if (Camera.Type == CameraType.FreeMoving)
-            {
-                camera.FreeCamera(e);
-            }
+            Control.KeyPress(e);
 
-            //Camera changing
-            if (e.KeyChar == 'v')
-            {
-                Camera.Type = CameraType.Static;
-            }
-            if (e.KeyChar == 'b')
-            {
-                Camera.Type = CameraType.FixedPath;
-            }
-            if (e.KeyChar == 'n')
-            {
-                Camera.Type = CameraType.FreeMoving;
-            }
-            if (e.KeyChar == 'm')
-            {
-                Camera.Type = CameraType.FollowItem;
-            }
-            
-            //Gravity
-            if (e.KeyChar == 'g')
-            {
-                control.Toggle_Gravity();
-            }
-
-            //Add New Sphere
-            if (e.KeyChar == 'z')
-            {
-                control.Add_New_Sphere();
-            }
-
-            //Clears all the balls
-            if (e.KeyChar == 'c')
-            {
-                Sphere.DrawList.Clear();
-            }
-
-            if (e.KeyChar == 'h')
-            {
-                control.Switch_Intergration();
-            }
-
-            if (e.KeyChar == 'p')
-            {
-                //Inverts the bool
-                portalViewMovement = !portalViewMovement;
-            }
-
+            //Fullscreen toggle
             if (e.KeyChar == '1')
             {
                 if (WindowState == WindowState.Fullscreen)
@@ -404,35 +348,25 @@ namespace Labs.ACW
                     WindowState = WindowState.Fullscreen;
                 }
             }
-
-            if (e.KeyChar == '#')
-            {
-                Emitter.crazyMode = !Emitter.crazyMode;
-
-                //Inverts the mode
-                Emitter.Init();
-            }
-
-            if (e.KeyChar == '.')
-            {
-                if (DrawMode == BeginMode.Triangles)
-                {
-                    DrawMode = BeginMode.LineStrip;
-                }
-                else
-                {
-                    DrawMode = BeginMode.Triangles;
-                }
-            }
-
         }
         protected override void OnUnload(EventArgs e)
         {
+            //Deletes active buffer
+            GL.BindVertexArray(0);
+
+            //Deletes Buffer objects
             GL.DeleteBuffers(mVBO.Length, mVBO);
             GL.DeleteBuffers(mVAO.Length, mVAO);
 
+            //Attaches shaders
+            mShader.Delete();
+
+            //Texture Delete
+            Top_Portal.Delete();
             Bottom_Portal.Delete();
             BrickWall.Delete();
+
+            GL.UseProgram(0);
 
             base.OnUnload(e);
         }

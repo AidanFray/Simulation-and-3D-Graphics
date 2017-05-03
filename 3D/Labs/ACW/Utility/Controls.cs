@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Labs.ACW
 {
     //--------------CONTROL LIST----------------//
+    // MOVEMENT
     // a - Move Left
     // d - Move Right
     //
@@ -19,24 +20,101 @@ namespace Labs.ACW
     // k - Rotate Clockwise
     // l - Rotate Anti-Clockwise
     //
+    // r - Y axis up
+    // f - Y axis down
+    //
     // CAMERA
     // v - Static Camera
-    // b - Fixed Path
+    // b - Fixed Path (Reset)
     // n - Free Moving
     // m - Follow Sphere
     //
+    // TOGGLES
     // g - Toggle Gravity
+    // p - Toggle CrazyMode
+    // h - Toggle Intergeneration method
+    // 1 - Toggle Fullscreen mode
+    // 0 - Toggle view mode
     //
     // SPHERES
     // z - Add new Sphere
-    // c - Clear all Sphere
-    //
-    // h - Switch Intergeneration method
+    // c - Clear all Spheres
     //------------------------------------------//
 
     public class Control
     {
-        public void Toggle_Gravity() //'g'
+        public static void KeyPress(KeyPressEventArgs e)
+        {
+            //Camera changing
+            if (Camera.Type == CameraType.FreeMoving)
+            {
+                ACWWindow.camera.FreeCamera(e);
+            }
+            if (e.KeyChar == 'v')
+            {
+                Camera.Type = CameraType.Static;
+            }
+            if (e.KeyChar == 'b')
+            {
+                Camera.Type = CameraType.FixedPath;
+            }
+            if (e.KeyChar == 'n')
+            {
+                Camera.Type = CameraType.FreeMoving;
+            }
+            if (e.KeyChar == 'm')
+            {
+                Camera.Type = CameraType.FollowItem;
+            }
+
+            //Gravity
+            if (e.KeyChar == 'g')
+            {
+                Toggle_Gravity();
+            }
+
+            //Add New Sphere
+            if (e.KeyChar == 'z')
+            {
+                Add_New_Sphere();
+            }
+
+            //Clears all the balls
+            if (e.KeyChar == 'c')
+            {
+                Sphere.DrawList.Clear();
+            }
+
+            //Changes integration method
+            if (e.KeyChar == 'h')
+            {
+                Switch_Intergration();
+            }
+            
+            //Activates a mode that increases the spawn rate
+            if (e.KeyChar == 'p')
+            {
+                Emitter.crazyMode = !Emitter.crazyMode;
+
+                //Inverts the mode
+                Emitter.Init();
+            }
+
+            //Changes view mode
+            if (e.KeyChar == '0')
+            {
+                if (ACWWindow.DrawMode == BeginMode.Triangles)
+                {
+                    ACWWindow.DrawMode = BeginMode.LineStrip;
+                }
+                else
+                {
+                    ACWWindow.DrawMode = BeginMode.Triangles;
+                }
+            }
+        }
+        
+        public static void Toggle_Gravity() //'g'
         {
             if (ACWWindow.gravityOn == false)
             {
@@ -49,8 +127,8 @@ namespace Labs.ACW
                 ACWWindow.gravityOn = false;
             }
         }
-        bool mix = true;
-        public void Add_New_Sphere()
+        static bool mix = true;
+        public static void Add_New_Sphere()
         {
             if (mix)
             {
@@ -66,7 +144,7 @@ namespace Labs.ACW
 
         } //z
     
-        public void Switch_Intergration()
+        public static void Switch_Intergration()
         {
             if (Sphere.intergration == Sphere.Intergration.Euler)
             {

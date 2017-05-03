@@ -332,6 +332,9 @@ namespace Labs.ACW.Object
             return s;
         }
 
+        Vector3 BottomPortalCentre = new Vector3(0, -19, 0);
+        Vector3 TopPortalCentre = new Vector3(4, 15, 0);
+
         //Actions to perform after collisions
         private List<Sphere> Collision_Action(Sphere Shape2)
         {
@@ -372,20 +375,23 @@ namespace Labs.ACW.Object
             BothCircles.Add(Shape2);
             return BothCircles;
         }
+
+        int rangeVal = 5;
         private Sphere BottomPortal_CollisionAction(Sphere s)
         {
             Material Mat = Translate_Material(s.material);
 
             SpawnSplash(new Vector3(s.mPosition.X, -20, s.mPosition.Z), Mat, new Vector3(0, -1, 0));
 
-            Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
-            Vector3 TopPortalCentre = new Vector3(4, 15, 0);
-
             //Get it's distance and direction from the portal center
             float distance = (BottomPortalCentre - s.mPosition).Length;
-            if (distance + s.mRadius > 6)
+            if (distance + s.mRadius > rangeVal)
             {
-                distance = 6 - s.mRadius;
+                distance = rangeVal - s.mRadius;
+            }
+            else if (distance + s.mRadius < -rangeVal)
+            {
+                distance = -rangeVal + s.mRadius;
             }
             
             Vector3 direction = (s.mPosition - BottomPortalCentre);
@@ -412,14 +418,15 @@ namespace Labs.ACW.Object
 
             SpawnSplash(new Vector3(4.5f, s.mPosition.Y, s.mPosition.Z), Mat, new Vector3(1, 0, 0));
 
-            Vector3 BottomPortalCentre = new Vector3(0, -20, 0);
-            Vector3 TopPortalCentre = new Vector3(4, 15, 0);
-
             //Get it's distance and direction from the portal center
             float distance = (TopPortalCentre - s.mPosition).Length;
-            if (distance + s.mRadius > 6)
+            if (distance + s.mRadius > rangeVal)
             {
-                distance = 6 - s.mRadius;
+                distance = rangeVal - s.mRadius;
+            }
+            else if (distance - s.mRadius < -rangeVal)
+            {
+                distance = -rangeVal + s.mRadius;
             }
 
             Vector3 direction = (s.mPosition - TopPortalCentre);
@@ -440,6 +447,7 @@ namespace Labs.ACW.Object
             return s;
         }
 
+        //Converts ball colour to portal colour
         private Material Translate_Material(Material s)
         {
             //Translates portal materials over
@@ -456,7 +464,7 @@ namespace Labs.ACW.Object
         }
 
         //--------SPLASH SYSTEM CHARACTERISTICS--------//
-        int maxParticles = 20;
+        int maxParticles = 10;
         float particle_Life = 1f;
         float squareSideSize = 0.5f;
         //--------------------------------------------//

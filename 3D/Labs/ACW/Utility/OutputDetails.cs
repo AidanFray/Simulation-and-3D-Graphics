@@ -29,6 +29,7 @@ namespace Labs.ACW
 
                 Console.WriteLine("Current Integration Method: " + Sphere.intergration.ToString());
                 Console.WriteLine("Crazy mode: " + Emitter.crazyMode.ToString());
+                Console.WriteLine("Sphere count: " + Sphere.DrawList.Count);
             }
         }
     }

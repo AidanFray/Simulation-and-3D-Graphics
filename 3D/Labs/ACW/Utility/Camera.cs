@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Labs.ACW
 {
-    enum CameraType
+    public enum CameraType
     {
         Static,
         FixedPath,
@@ -18,7 +18,7 @@ namespace Labs.ACW
         PortalView
     }
 
-    class Camera
+    public class Camera
     {
         public static CameraType Type = new CameraType();
 
@@ -105,6 +105,14 @@ namespace Labs.ACW
             ACWWindow.mView = Matrix4.CreateTranslation(-0.8f, -0.5f, -50f);
             int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
             GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
+
+            //Update positions
+            for (int i = 0; i < Light.mLights.Count; i++)
+            {
+                int uLightDirectionLocation = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, string.Format("uLight[{0}].Position", i)); //
+                Vector4 position = Vector4.Transform(new Vector4(Light.mLights[i].mPosition, 1), ACWWindow.mView);
+                GL.Uniform4(uLightDirectionLocation, position);
+            }
 
             ACWWindow.mGroundModel = Matrix4.CreateTranslation(1, -0.5f, 0f);
         }
