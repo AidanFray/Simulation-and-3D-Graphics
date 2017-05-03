@@ -40,8 +40,8 @@ namespace Labs.ACW
         //Used to create and initalise the emitters
         public static void Init()
         {
-            mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 2f, Sphere.Blue_Sphere, true));
-            mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 3f, Sphere.Orange_Sphere, true));
+            mEmitterList.Add(new Emitter(new Vector3(1, 18, 0), 1f, Sphere.Blue_Sphere, true));
+            mEmitterList.Add(new Emitter(new Vector3(-2, 18, 0), 2f, Sphere.Orange_Sphere, true));
 
             //EmitterList.Add(new Emitter(new Vector3(-4, 18, -4), 10, Sphere.Orange_Sphere, false));
         }

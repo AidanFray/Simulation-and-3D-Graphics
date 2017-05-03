@@ -318,12 +318,13 @@ namespace Labs.ACW.Object
             {
                 if (VectorFromSquare.Length < s.mRadius + c.mRadius)
                 {
+                    s.mPosition = s.mOldPosition;
+
                     Vector3 normal;
 
                     normal = (s.mPosition - (L2p + A));
                     normal.Normalize();
-
-                    s.mPosition = s.mOldPosition;
+                    
                     s.mVelocity = CalculateVelocity(normal, s.mVelocity);
                 }
             }

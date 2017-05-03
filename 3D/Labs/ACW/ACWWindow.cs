@@ -39,7 +39,7 @@ namespace Labs.ACW
         public static bool gravityOn;
         public static float E = 0.8f;
         public static float timestep;
-        public static float sphereLimit = 5;
+        public static float sphereLimit = 20;
         private Timer mTimer = new Timer(); //General timer
         private float viewDistance = 200;
         private bool portalViewMovement = true;
