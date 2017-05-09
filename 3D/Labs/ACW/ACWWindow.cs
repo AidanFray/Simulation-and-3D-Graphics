@@ -7,15 +7,6 @@ using Labs.ACW.Object;
 using Labs.ACW.Utility;
 using System.Collections.Generic;
 using Labs.ACW.Textures;
-
-//==FEATURES
-//TODO: Look into having multiple shaders
-//-Doing collisions in the shader
-
-//TODO: Different splash animation for entering and leaving the portal
-
-//TODO: Adding fractals into portal splash. Idea obtained from: "Fractals - Hunting the Hidden Dimension"
-    //-The idea is each particle is a splash system
 namespace Labs.ACW
 {
     public class ACWWindow : GameWindow
@@ -79,7 +70,7 @@ namespace Labs.ACW
             : base(
                 1000, // Width
                 800, // Height
-                GraphicsMode.Default,
+                new GraphicsMode(32, 24, 0, 4),
                 "Assessed Coursework",
                 GameWindowFlags.Default,
                 DisplayDevice.Default,
@@ -107,7 +98,7 @@ namespace Labs.ACW
             //Renders the objects to the screen buffer
             Frame_Buffer.Unbind_Buffer();
             Render_Objects();
-        
+
             GL.BindVertexArray(0);
             this.SwapBuffers();
 
@@ -124,9 +115,8 @@ namespace Labs.ACW
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             timestep = mTimer.GetElapsedSeconds();
-
-                Portal_Camera();
-          
+            
+            Portal_Camera();
             Sphere.Update();
             Light.Update();
             Emitter.Update();
@@ -134,7 +124,7 @@ namespace Labs.ACW
             Camera.Update(camera);
             OutputDetails.Update();
             splash.Update();
-            
+
             foreach (ParticleSystem sp in ActiveParticleSystems)
             {
                 sp.Update();
@@ -151,7 +141,8 @@ namespace Labs.ACW
             //Init
             GL.ClearColor(Color4.Black);
             GL.Enable(EnableCap.DepthTest);
-            
+            GL.Enable(EnableCap.Multisample);
+
             Camera.Type = CameraType.Static;
 
             mShader = new ShaderUtility(@"ACW/Shaders/s.vert", @"ACW/Shaders/Light.frag");
@@ -370,7 +361,7 @@ namespace Labs.ACW
 
             base.OnUnload(e);
         }
-       
+
         //Renders the scene
         public void Render_Objects()
         {
@@ -394,7 +385,7 @@ namespace Labs.ACW
             {
                 s.Draw();
             }
-            
+
             //SoD
             Texture.Unbind();
             Level.DoomSphere.Apply_MaterialValues();
@@ -415,15 +406,15 @@ namespace Labs.ACW
             DrawBottomPortalOutline();
             DrawTopPortalOutline();
 
-             //This stops the back of cylinders from not being drawn
+            //This stops the back of cylinders from not being drawn
             GL.Disable(EnableCap.CullFace);
             Texture.Unbind();
             //Draws the splash particle effect
             splash.Draw();
-            
+
             //Draws Cylinders
             GL.BindVertexArray(mVAO[2]);
-           
+
             foreach (Cylinder c in Level.Level1_Cylinders) //LEVEL 1
             {
                 Level.Draw_Cylinders(c, Level.Level1);
@@ -463,7 +454,7 @@ namespace Labs.ACW
             GL.DrawElements(DrawMode, 6, DrawElementsType.UnsignedInt, 30 * sizeof(float)); //Bottom
 
         } //Missed the top section
-       
+
         //Adds outlines to the portal
         private void DrawBottomPortalOutline()
         {
@@ -478,7 +469,7 @@ namespace Labs.ACW
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
 
             //Back
-            Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(-4.9f, height, -1f)) * Matrix4.CreateRotationY(-(float)Math.PI/2);
+            Side = Matrix4.CreateScale(new Vector3(0.5f, 1, 25)) * Matrix4.CreateTranslation(new Vector3(-4.9f, height, -1f)) * Matrix4.CreateRotationY(-(float)Math.PI / 2);
             GL.UniformMatrix4(uModelLocation, true, ref Side);
             GL.DrawElements(BeginMode.Triangles, 6, DrawElementsType.UnsignedInt, 24 * sizeof(float)); //Top
 
@@ -533,7 +524,7 @@ namespace Labs.ACW
 
             GL.Enable(EnableCap.CullFace);
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-            
+
             Matrix4 previousView = mView;
             mView = mTopPortalView;
             GL.UniformMatrix4(uView, true, ref mView);
@@ -582,13 +573,13 @@ namespace Labs.ACW
 
             GL.Enable(EnableCap.CullFace);
             int uView = GL.GetUniformLocation(mShader.ShaderProgramID, "uView");
-            
+
             Matrix4 previousView = mView;
             mView = mBottomPortalView;
             GL.UniformMatrix4(uView, true, ref mView);
 
             camera.UpdateLightPositions();
-            
+
             //Draws the Spheres
             GL.BindVertexArray(mVAO[0]);
             foreach (Sphere s in Sphere.DrawList)
@@ -624,10 +615,10 @@ namespace Labs.ACW
         private void Portal_Camera()
         {
             Vector3 currentCameraPosition = Vector3.Transform(new Vector3(1, 1, 1), mView);
-            
+
             Vector3 bottomPortalPosition = new Vector3(0, -20, 0);
             Vector3 topPortalPosition = new Vector3(0, -18, 0);
-            
+
             //BOTTOM - Y
             double opposite = bottomPortalPosition.Y - currentCameraPosition.Y;
             double adjacent = bottomPortalPosition.Z - currentCameraPosition.Z;
@@ -639,7 +630,7 @@ namespace Labs.ACW
             adjacent = bottomPortalPosition.X - currentCameraPosition.X;
             angle = Math.Sin(adjacent / opposite);
             topRotation *= Matrix4.CreateRotationX(Angle_Limit(angle, 20));
-            
+
             //TOP - Y
             opposite = topPortalPosition.Y - currentCameraPosition.Y;
             adjacent = topPortalPosition.Z - currentCameraPosition.Z;
@@ -656,7 +647,7 @@ namespace Labs.ACW
         {
             //Converts the limit to radians
             limit = limit * (Math.PI / 180);
-            
+
             if (angle > limit)
             {
                 angle = limit;

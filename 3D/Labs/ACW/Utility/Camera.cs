@@ -30,7 +30,6 @@ namespace Labs.ACW
             }
             else
             {
-
                 if (Camera.Type == CameraType.FixedPath)
                 {
                     camera.Rotate_World_Y(0.005f);

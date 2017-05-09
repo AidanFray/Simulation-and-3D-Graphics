@@ -265,8 +265,6 @@ namespace Labs.ACW.Utility
 
             //Moves the particle
             mPosition = mPosition + mVelocity * mDeltaTime;
-
-            //TODO: Add rotation update
         }
     }
     public class SplashParticle : Particle
@@ -377,9 +375,6 @@ namespace Labs.ACW.Utility
             Vector3 col = new Vector3((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble());
 
             Vector3 pos = RandomizePosition();
-
-            //TODO: Add Rotation
-            //TODO: Add Scale rnd 
 
             return new CubeParticle(mModel, mParticle_LifeTime, mMat, vel, new Vector3(0.5f,0.5f,0.5f), pos);
         }
