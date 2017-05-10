@@ -70,7 +70,7 @@ namespace Labs.ACW
             : base(
                 1000, // Width
                 800, // Height
-                new GraphicsMode(32, 24, 0, 4),
+                new GraphicsMode(32, 24, 0, 8),
                 "Assessed Coursework",
                 GameWindowFlags.Default,
                 DisplayDevice.Default,

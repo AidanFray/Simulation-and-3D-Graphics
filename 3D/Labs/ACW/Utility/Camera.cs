@@ -1,11 +1,7 @@
 ﻿using Labs.ACW.Object;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Labs.Utility;
 
 namespace Labs.ACW
 {
@@ -21,7 +17,14 @@ namespace Labs.ACW
     public class Camera
     {
         public static CameraType Type = new CameraType();
+        public Vector3 mVelocity;
+        public static Timer mRotationTimer = new Timer();
+        private static float mTimeStep = 0;
 
+        //-----------------------------------------//
+        private static float mRotationSpeed = 0.5f;
+        //-----------------------------------------//
+        
         public static void Update(Camera camera)
         {
             if (Camera.Type == CameraType.Static)
@@ -32,7 +35,12 @@ namespace Labs.ACW
             {
                 if (Camera.Type == CameraType.FixedPath)
                 {
-                    camera.Rotate_World_Y(0.005f);
+                    //Grabs elapsed time
+                    mTimeStep = mRotationTimer.GetElapsedSeconds();
+
+                    //Rotates the world
+                    camera.Rotate_World_Y(mRotationSpeed * mTimeStep);
+                    
                     int uView = GL.GetUniformLocation(ACWWindow.mShader.ShaderProgramID, "uView");
                     GL.UniformMatrix4(uView, true, ref ACWWindow.mView);
                 }
@@ -89,6 +97,7 @@ namespace Labs.ACW
             GL.Uniform4(uEyePositionLocation, eyePosition);
 
         }
+
         public void UpdateLightPositions()
         {
             //Update positions
@@ -115,20 +124,20 @@ namespace Labs.ACW
 
             ACWWindow.mGroundModel = Matrix4.CreateTranslation(1, -0.5f, 0f);
         }
+        
         public void FreeCamera(KeyPressEventArgs e)
         {
             float speed = 1f;
+            float rotationSpeed = 0.05f;
 
             //==X==
             if (e.KeyChar == 'a') //-
             {
                 MoveCamera(Matrix4.CreateTranslation(speed, 0, 0));
-                ACWWindow.topRotation *= Matrix4.CreateRotationX(-0.04f);
             }
             if (e.KeyChar == 'd') //+
             {
                 MoveCamera(Matrix4.CreateTranslation(-speed, 0, 0));
-                ACWWindow.topRotation *= Matrix4.CreateRotationX(0.04f);
             }
 
             //==Y==
@@ -154,21 +163,21 @@ namespace Labs.ACW
             //Rotate X-Axis 
             if (e.KeyChar == 'e')
             {
-                MoveCamera(Matrix4.CreateRotationY(0.05f));
+                MoveCamera(Matrix4.CreateRotationY(rotationSpeed));
             }
             if (e.KeyChar == 'q')
             {
-                MoveCamera(Matrix4.CreateRotationY(-0.05f));
+                MoveCamera(Matrix4.CreateRotationY(-rotationSpeed));
             }
 
             //Rotate World
             if (e.KeyChar == 'k')
             {
-                Rotate_World_Y(-0.05f);
+                Rotate_World_Y(-rotationSpeed);
             }
             if (e.KeyChar == 'l')
             {
-                Rotate_World_Y(0.05f);
+                Rotate_World_Y(rotationSpeed);
             }
         }
     }

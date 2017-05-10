@@ -56,6 +56,7 @@ namespace Labs.ACW
             }
             if (e.KeyChar == 'b')
             {
+                Camera.mRotationTimer.Start();
                 Camera.Type = CameraType.FixedPath;
             }
             if (e.KeyChar == 'n')
