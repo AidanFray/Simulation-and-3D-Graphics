@@ -7,6 +7,7 @@ using Labs.ACW.Object;
 using Labs.ACW.Utility;
 using System.Collections.Generic;
 using Labs.ACW.Textures;
+
 namespace Labs.ACW
 {
     public class ACWWindow : GameWindow
@@ -70,7 +71,7 @@ namespace Labs.ACW
             : base(
                 1000, // Width
                 800, // Height
-                new GraphicsMode(32, 24, 0, 8),
+                GraphicsMode.Default,
                 "Assessed Coursework",
                 GameWindowFlags.Default,
                 DisplayDevice.Default,
@@ -115,8 +116,9 @@ namespace Labs.ACW
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             timestep = mTimer.GetElapsedSeconds();
-            
+
             Portal_Camera();
+
             Sphere.Update();
             Light.Update();
             Emitter.Update();
@@ -141,7 +143,6 @@ namespace Labs.ACW
             //Init
             GL.ClearColor(Color4.Black);
             GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.Multisample);
 
             Camera.Type = CameraType.Static;
 

@@ -214,3 +214,9 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+*.pdb
+*.pdb
+*.exe
+3D/Labs/bin/Debug/Labs.exe
+*.cache
+3D/Labs/obj/Debug/Labs.csproj.FileListAbsolute.txt
