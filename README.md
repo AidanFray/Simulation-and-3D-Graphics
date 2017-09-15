@@ -1,6 +1,8 @@
 # Simulation-and-3D-Graphics
 A university graphics and simulation project.
 
+[![alt](http://i65.tinypic.com/2a6ldv9.png)](https://www.youtube.com/watch?v=yxUFEYLiOiI)
+
 # Controls
      MOVEMENT (If Free Moving camera)
      a - Move Left
